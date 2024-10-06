@@ -1,0 +1,92 @@
+---
+title: Cyclist data analysis
+format: gfm
+---
+
+# Preparing control
+
+first, we will prepare the necesary libraries to make an initial exploration
+
+```{r}
+library(tidyverse)
+library(mapview)
+library(lubridate)
+library(sf)
+library(geosphere)
+```
+Loading data from source if not available locally. First look at the shape of the data.
+```{r}
+if(!file.exists("202408-divvy-tripdata.zip")) {
+  download.file("https://divvy-tripdata.s3.amazonaws.com/202408-divvy-tripdata.zip","202408-divvy-tripdata.zip")
+}
+
+df <- read_csv("202408-divvy-tripdata.zip")
+glimpse(df)
+summarise(df)
+
+```
+
+```{r}
+df <- df %>%
+  drop_na() %>%
+  unique()
+
+graoh <- ggplot(data = df) +
+  aes(x = member_casual, fill = rideable_type) +
+  geom_bar()
+
+distm_v   <-  Vectorize(function(x1,y1,x2,y2) {
+  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
+}
+)
+
+data  <- df %>%
+  mutate(distance = distm_v(end_lng, end_lat, start_lng, end_lat), time = as.integer(ended_at - started_at)) %>%
+  mutate(avg_velocity = distance/ time) %>%
+  select(ride_id, start_station_id, started_at, time, distance, member_casual, rideable_type, start_lng, start_lat, avg_velocity)
+
+visual  <- data %>%
+  select(member_casual, avg_velocity, distance, time) %>%
+  group_by(member_casual) %>%
+  summarise(avg_time_used = mean(time), avg_distance = mean(distance), count = n())
+
+p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
+
+p1  <- ggplot(data = visual) + aes(x = member_casual, y= avg_distance) + geom_col()
+
+p2  <- ggplot(data = visual) + aes(x = member_casual, y= count) + geom_col()
+
+p
+p1
+p2
+
+ggplot(data=data) + aes(x = distance) + geom_histogram(bins=60) + facet_grid(vars(member_casual))
+per_hour_day  <- ggplot(data=data) + aes(x = hour(started_at)) + geom_histogram(bins = 24, fill = 'lightblue', color = 'darkblue') + facet_grid(cols=vars(member_casual), rows=vars(wday(started_at, week_start = 1, label = TRUE, abbr = FALSE))) + labs(title = 'Rides per hour of day', subtitle='Data from Agust 2024', x='Hour',y='Number of rides')+  theme_linedraw()
+per_day <-  ggplot(data=data) + aes(x = wday(started_at, week_start = 1), fill = rideable_type) + geom_histogram() + facet_grid(cols=vars(member_casual), rows =vars(week(started_at))) + labs(x='day of the week', title = 'Rides per day of the week', subtitle = 'Data from Agust, 2024', y = 'Number of rides') + theme_linedraw()
+ggplot(data=filter(data, time < 3000)) + aes(x=hms::as_hms(started_at), y=time, colour=rideable_type) + geom_point() + facet_grid(rows=vars(wday(started_at)), cols=vars(member_casual))
+per_day
+per_hour_day
+
+#data %>%
+#  select(started_at, time) %>%
+#  mutate(hour = hour(started_at), day  )
+#
+#ggplot() + aes(x=distance, y=time, colour=rideable_type  )+ geom_point()
+#data %>% slice_min(time)
+#glimpse(data)
+#map  <- data %>%
+#  group_by(start_station_id, start_lng, start_lat, member_casual, rideable_type) %>%
+#  summarise(avg_dist = mean(distance), avg_time = mean (time), rides = n(), avg_vel = mean(avg_velocity), .groups = "keep")
+#
+#pos  <- map %>%
+#  arrange(desc(avg_dist))
+#
+#
+#loc_sf  <- st_as_sf(map, coords = c('start_lng', 'start_lat')) 
+#st_crs(loc_sf) = 4236 
+#
+#mapview(loc_sf, zcol='rides')
+#mapview(loc_sf, zcol='avg_dist')
+#
+#
+```
