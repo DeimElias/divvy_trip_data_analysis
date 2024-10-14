@@ -5,7 +5,7 @@ format: gfm
 
 # Preparing control
 
-first, we will prepare the necesary libraries to make an initial exploration
+First, we will prepare the necesary libraries to make an initial exploration.
 
 ```{r}
 library(tidyverse)
@@ -14,22 +14,41 @@ library(lubridate)
 library(sf)
 library(geosphere)
 ```
-Loading data from source if not available locally. First look at the shape of the data.
+
+Loading data from source if not available locally. 
+
 ```{r}
 if(!file.exists("202408-divvy-tripdata.zip")) {
   download.file("https://divvy-tripdata.s3.amazonaws.com/202408-divvy-tripdata.zip","202408-divvy-tripdata.zip")
 }
-
-df <- read_csv("202408-divvy-tripdata.zip")
-glimpse(df)
-summarise(df)
-
 ```
+# Exploratory face
+Read file as a tibble and first look at data.
 
 ```{r}
+df <- read_csv("202408-divvy-tripdata.zip")
+glimpse(df)
+summary(df)
+df %>% unique() %>% summary()
+```
+
+As we can see, there is no key colums, which is not a problem, since each row is unique. 
+We only have 1027 NA. We can drop them, since they represent less than a .1% of the total data. \
+We have some colums that represent geographical data from our stations, lets have a deeper look at them.
+
+```{r}
+df %>% select(start_station_id) %>% unique() %>% count()
+df %>% select(end_station_id) %>% unique() %>% count()
+df %>% select(start_station_id, start_lat, start_lng) %>%
+  unique() %>%
+  count()
+
+```
+We have multiple greographical values for some stations. Altought this could be intented (to have precise data on where was the bycicle taken/returned), we are not interested in those especifics, lets fix them.
+# Data cleaning
+```{r}
 df <- df %>%
-  drop_na() %>%
-  unique()
+  drop_na()
 
 graoh <- ggplot(data = df) +
   aes(x = member_casual, fill = rideable_type) +

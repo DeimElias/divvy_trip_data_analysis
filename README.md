@@ -3,8 +3,8 @@
 
 # Preparing control
 
-first, we will prepare the necesary libraries to make an initial
-exploration
+First, we will prepare the necesary libraries to make an initial
+exploration.
 
 ``` r
 library(tidyverse)
@@ -33,14 +33,19 @@ library(sf)
 library(geosphere)
 ```
 
-Loading data from source if not available locally. First look at the
-shape of the data.
+Loading data from source if not available locally.
 
 ``` r
 if(!file.exists("202408-divvy-tripdata.zip")) {
   download.file("https://divvy-tripdata.s3.amazonaws.com/202408-divvy-tripdata.zip","202408-divvy-tripdata.zip")
 }
+```
 
+# Exploratory face
+
+Read file as a tibble and first look at data.
+
+``` r
 df <- read_csv("202408-divvy-tripdata.zip")
 ```
 
@@ -76,10 +81,117 @@ glimpse(df)
     $ member_casual      <chr> "member", "member", "member", "member", "casual", "…
 
 ``` r
-summarise(df)
+summary(df)
 ```
 
-    # A tibble: 1 × 0
+       ride_id          rideable_type        started_at                    
+     Length:755639      Length:755639      Min.   :2024-07-30 23:06:26.89  
+     Class :character   Class :character   1st Qu.:2024-08-08 16:52:03.75  
+     Mode  :character   Mode  :character   Median :2024-08-16 09:29:33.76  
+                                           Mean   :2024-08-16 10:53:22.75  
+                                           3rd Qu.:2024-08-24 12:15:39.46  
+                                           Max.   :2024-08-31 23:58:30.89  
+                                                                           
+        ended_at                      start_station_name start_station_id  
+     Min.   :2024-08-01 00:00:16.84   Length:755639      Length:755639     
+     1st Qu.:2024-08-08 17:07:32.32   Class :character   Class :character  
+     Median :2024-08-16 09:45:41.80   Mode  :character   Mode  :character  
+     Mean   :2024-08-16 11:12:07.51                                        
+     3rd Qu.:2024-08-24 12:38:19.82                                        
+     Max.   :2024-08-31 23:59:53.88                                        
+                                                                           
+     end_station_name   end_station_id       start_lat       start_lng     
+     Length:755639      Length:755639      Min.   :41.65   Min.   :-87.90  
+     Class :character   Class :character   1st Qu.:41.88   1st Qu.:-87.66  
+     Mode  :character   Mode  :character   Median :41.90   Median :-87.64  
+                                           Mean   :41.90   Mean   :-87.65  
+                                           3rd Qu.:41.93   3rd Qu.:-87.63  
+                                           Max.   :42.07   Max.   :-87.52  
+                                                                           
+        end_lat         end_lng       member_casual     
+     Min.   :16.06   Min.   :-97.47   Length:755639     
+     1st Qu.:41.88   1st Qu.:-87.66   Class :character  
+     Median :41.90   Median :-87.64   Mode  :character  
+     Mean   :41.90   Mean   :-87.65                     
+     3rd Qu.:41.93   3rd Qu.:-87.63                     
+     Max.   :46.16   Max.   :-79.02                     
+     NA's   :1027    NA's   :1027                       
+
+``` r
+df %>% unique() %>% summary()
+```
+
+       ride_id          rideable_type        started_at                    
+     Length:755639      Length:755639      Min.   :2024-07-30 23:06:26.89  
+     Class :character   Class :character   1st Qu.:2024-08-08 16:52:03.75  
+     Mode  :character   Mode  :character   Median :2024-08-16 09:29:33.76  
+                                           Mean   :2024-08-16 10:53:22.75  
+                                           3rd Qu.:2024-08-24 12:15:39.46  
+                                           Max.   :2024-08-31 23:58:30.89  
+                                                                           
+        ended_at                      start_station_name start_station_id  
+     Min.   :2024-08-01 00:00:16.84   Length:755639      Length:755639     
+     1st Qu.:2024-08-08 17:07:32.32   Class :character   Class :character  
+     Median :2024-08-16 09:45:41.80   Mode  :character   Mode  :character  
+     Mean   :2024-08-16 11:12:07.51                                        
+     3rd Qu.:2024-08-24 12:38:19.82                                        
+     Max.   :2024-08-31 23:59:53.88                                        
+                                                                           
+     end_station_name   end_station_id       start_lat       start_lng     
+     Length:755639      Length:755639      Min.   :41.65   Min.   :-87.90  
+     Class :character   Class :character   1st Qu.:41.88   1st Qu.:-87.66  
+     Mode  :character   Mode  :character   Median :41.90   Median :-87.64  
+                                           Mean   :41.90   Mean   :-87.65  
+                                           3rd Qu.:41.93   3rd Qu.:-87.63  
+                                           Max.   :42.07   Max.   :-87.52  
+                                                                           
+        end_lat         end_lng       member_casual     
+     Min.   :16.06   Min.   :-97.47   Length:755639     
+     1st Qu.:41.88   1st Qu.:-87.66   Class :character  
+     Median :41.90   Median :-87.64   Mode  :character  
+     Mean   :41.90   Mean   :-87.65                     
+     3rd Qu.:41.93   3rd Qu.:-87.63                     
+     Max.   :46.16   Max.   :-79.02                     
+     NA's   :1027    NA's   :1027                       
+
+As we can see, there is no key colums. Fortunally, each row is unique,
+and we only have 1027 NA. We can drop them, since they represent less
+than a .1% of the total data. We have some colums that represent
+geographical data from our stations, lets have a deeper look at them.
+
+``` r
+df %>% select(start_station_id) %>% unique() %>% count()
+```
+
+    # A tibble: 1 × 1
+          n
+      <int>
+    1  1346
+
+``` r
+df %>% select(end_station_id) %>% unique() %>% count()
+```
+
+    # A tibble: 1 × 1
+          n
+      <int>
+    1  1368
+
+``` r
+df %>% select(start_station_id, start_lat, start_lng) %>%
+  unique() %>%
+  count()
+```
+
+    # A tibble: 1 × 1
+          n
+      <int>
+    1 24956
+
+We have multiple greographical values for some stations. Altought this
+could be intented (to have precise data on where was the bycicle
+taken/returned), we are not interested in those especifics, lets fix
+them.
 
 ``` r
 df <- df %>%
@@ -114,25 +226,25 @@ p2  <- ggplot(data = visual) + aes(x = member_casual, y= count) + geom_col()
 p
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-1.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-1.png)
 
 ``` r
 p1
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-2.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-2.png)
 
 ``` r
 p2
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-3.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-3.png)
 
 ``` r
 ggplot(data=data) + aes(x = distance) + geom_histogram(bins=60) + facet_grid(vars(member_casual))
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-4.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-4.png)
 
 ``` r
 per_hour_day  <- ggplot(data=data) + aes(x = hour(started_at)) + geom_histogram(bins = 24, fill = 'lightblue', color = 'darkblue') + facet_grid(cols=vars(member_casual), rows=vars(wday(started_at, week_start = 1, label = TRUE, abbr = FALSE))) + labs(title = 'Rides per hour of day', subtitle='Data from Agust 2024', x='Hour',y='Number of rides')+  theme_linedraw()
@@ -140,7 +252,7 @@ per_day <-  ggplot(data=data) + aes(x = wday(started_at, week_start = 1), fill =
 ggplot(data=filter(data, time < 3000)) + aes(x=hms::as_hms(started_at), y=time, colour=rideable_type) + geom_point() + facet_grid(rows=vars(wday(started_at)), cols=vars(member_casual))
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-5.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-5.png)
 
 ``` r
 per_day
@@ -148,13 +260,13 @@ per_day
 
     `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](README_files/figure-commonmark/unnamed-chunk-3-6.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-6.png)
 
 ``` r
 per_hour_day
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-3-7.png)
+![](README_files/figure-commonmark/unnamed-chunk-5-7.png)
 
 ``` r
 #data %>%
