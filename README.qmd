@@ -49,8 +49,8 @@ df |>
 colSums(is.na(df))
 ```
 
-We only have almost 20% of colums with NA values. We could drop them, since our sample would still be big enough\
-Although, we could try to save some of them. Since most of them com from missing information from stations.
+We have almost 20% of colums with NA values. We could drop them, since our sample would still be big enough\
+Although, we could try to save some of them. Since most of them come from missing information from stations.
 We have some colums that represent geographical data from our stations, lets have a deeper look at them.
 
 ```{r}
@@ -70,7 +70,7 @@ df |>
   dim()
 ```
 
-We have multiple greographical values for some stations. Altought this could be intented 
+We can deduce that this dataset has multiple values for some stations. Altought this could be intented 
 (to have precise data on where was the bycicle taken/returned), we are not interested in those especifics, lets fix them.
 Looking at the page from divvy, we could obtain the exact location of the stations, let's incorporate that
 
@@ -110,21 +110,6 @@ closestStationMargin <- function(margin) {
     }
 }
 
-stationsGetClosest <- closestStationMargin(0.001)
-
-plan(multicore, workers = 3)
-lala<- stations.geoinfo |>
-  rename(latitude = lat, longitude = lng) |>
-  slice_sample(n=50000)|>
-  mutate(station_id=future_map2_chr(latitude,longitude, stationsGetClosest))
-
-```
-
-# Data cleaning
-```{r}
-df <- df |>
-      drop_na()
-
 stations_start <- select(df, start_station_id, start_lat, start_lng) |>
             rename(station_id = start_station_id, lat = start_lat, lng = start_lng)
 
@@ -134,6 +119,25 @@ stations_end <- select(df, end_station_id, end_lat, end_lng) |>
 stations.geoinfo <- bind_rows(stations_start, stations_end) |>
             select(lat, lng) |>
             unique()
+
+stationsGetClosest <- closestStationMargin(0.001)
+
+plan(multicore, workers = 3)
+stations.with.id <- if (file.exists("coords_with_names.csv")) {
+    read_csv("coords_with_names.csv")
+ } else {
+  stations.geoinfo |>
+  rename(latitude = lat, longitude = lng) |>
+  slice_sample(n=50000)|>
+  mutate(station_id=future_map2_chr(latitude,longitude, stationsGetClosest))
+ }
+```
+
+# Data cleaning
+```{r}
+df <- df |>
+      drop_na()
+
 
 df <- df |>
       left_join(stations, by=join_by(start_station_id == station_id))#, suffix = c("original","started"), relationship="many-to-one") #|>
