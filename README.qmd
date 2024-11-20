@@ -21,7 +21,7 @@ Loading data from source if not available locally.
 
 ```{r}
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
-df <- data.frame()
+df <- tibble()
 for (date in dates) {
   file <- sprintf("%s-divvy-tripdata.zip", date) 
   if(!file.exists(file)) {
@@ -80,7 +80,8 @@ download.file('https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json',s
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, name, lon, lat )
+  select(station_id, name, lon, lat ) |>
+  mutate(distance = 1.1)
 
 stations 
 
@@ -90,24 +91,30 @@ distm_v   <-  Vectorize(function(x1,y1,x2,y2) {
   }
 )
 
+assert.value <- function(value) {
+  if (dim(value)[1] == 0) {
+    return(tibble(station_id=""))
+  }
+  value
+}
+
 closestStationMargin <- function(margin) {
   function(latitude, longitude) {
       station.closest <- stations |>
-        select(lat, lon, station_id) |>
+        select(lat, lon, station_id, distance) |>
         filter(lat < latitude + margin & lat > latitude - margin & lon < longitude + margin & lon > longitude - margin) |>
         mutate(distance = distm_v(longitude, latitude, lon ,lat)) |>
-        arrange(distance) |>
-        first() |>
+        slice_min(distance, n = 1, with_ties = FALSE) |>
+        assert.value() |>
         _$station_id
-      return(station.closest)
     }
 }
 
 stationsGetClosest <- closestStationMargin(0.001)
-sample <- stations.geoinfo |>
-  rename(latitude = lat, longitude = lng)
+
 plan(multicore, workers = 3)
-lala<- sample |>
+lala<- stations.geoinfo |>
+  rename(latitude = lat, longitude = lng) |>
   slice_sample(n=50000)|>
   mutate(station_id=future_map2_chr(latitude,longitude, stationsGetClosest))
 
