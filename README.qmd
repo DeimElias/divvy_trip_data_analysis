@@ -23,12 +23,12 @@ Loading data from source if not available locally.
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
 df <- tibble()
 for (date in dates) {
-  file <- sprintf("%s-divvy-tripdata.zip", date) 
-  if(!file.exists(file)) {
-    link <- sprintf('https://divvy-tripdata.s3.amazonaws.com/%s',file)
+  file <- sprintf("%s-divvy-tripdata.zip", date)
+  if (!file.exists(file)) {
+    link <- sprintf("https://divvy-tripdata.s3.amazonaws.com/%s", file)
     download.file(link, file)
   }
-  df <-df |> bind_rows(read_csv(file))
+  df <- df |> bind_rows(read_csv(file))
 }
 ```
 # Exploratory face
@@ -42,9 +42,9 @@ summary(df)
 dim(df)
 
 df |>
- select(ride_id) |>
- unique() |>
- dim()
+  select(ride_id) |>
+  unique() |>
+  dim()
 
 colSums(is.na(df))
 ```
@@ -64,7 +64,7 @@ df |>
   unique() |>
   dim()
 
-df |> 
+df |>
   select(start_station_id, start_lat, start_lng) |>
   unique() |>
   dim()
@@ -75,129 +75,119 @@ We can deduce that this dataset has multiple values for some stations. Altought 
 Looking at the page from divvy, we could obtain the exact location of the stations, let's incorporate that
 
 ```{r} 
-stations_json <- 'stations.json'
-download.file('https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json',stations_json)
+stations_json <- "stations.json"
+download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, name, lon, lat ) |>
+  select(station_id, name, lon, lat) |>
   mutate(distance = 1.1)
 
-stations 
+stations
 
 
-distm_v   <-  Vectorize(function(x1,y1,x2,y2) {
+distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
-  }
-)
+})
 
 assert.value <- function(value) {
   if (dim(value)[1] == 0) {
-    return(tibble(station_id=""))
+    return(tibble(station_id = ""))
   }
   value
 }
 
 closestStationMargin <- function(margin) {
   function(latitude, longitude) {
-      station.closest <- stations |>
-        select(lat, lon, station_id, distance) |>
-        filter(lat < latitude + margin & lat > latitude - margin & lon < longitude + margin & lon > longitude - margin) |>
-        mutate(distance = distm_v(longitude, latitude, lon ,lat)) |>
-        slice_min(distance, n = 1, with_ties = FALSE) |>
-        assert.value() |>
-        _$station_id
-    }
+    station.closest <- stations |>
+      select(lat, lon, station_id, distance) |>
+      filter(lat < latitude + margin & lat > latitude - margin & lon < longitude + margin & lon > longitude - margin) |>
+      mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
+      slice_min(distance, n = 1, with_ties = FALSE) |>
+      assert.value() |>
+      _$station_id
+  }
 }
 
-stations_start <- select(df, start_station_id, start_lat, start_lng) |>
-            rename(station_id = start_station_id, lat = start_lat, lng = start_lng)
-
-stations_end <- select(df, end_station_id, end_lat, end_lng) |>
-            rename(station_id = end_station_id, lat = end_lat, lng = end_lng)
-
-stations.geoinfo <- bind_rows(stations_start, stations_end) |>
-            select(lat, lng) |>
-            unique()
+stations.geoinfo <- select(df, start_lat, start_lng) |>
+  rename(lat = start_lat, lng = start_lng) |>
+  bind_rows(select(df, end_lat, end_lng) |>
+    rename(lat = end_lat, lng = end_lng)) |>
+  unique()
 
 stationsGetClosest <- closestStationMargin(0.001)
 
 plan(multicore, workers = 3)
 stations.with.id <- if (file.exists("coords_with_names.csv")) {
-    read_csv("coords_with_names.csv")
- } else {
+  read_csv("coords_with_names.csv")
+} else {
   stations.geoinfo |>
-  rename(latitude = lat, longitude = lng) |>
-  slice_sample(n=50000)|>
-  mutate(station_id=future_map2_chr(latitude,longitude, stationsGetClosest))
- }
+    rename(latitude = lat, longitude = lng) |>
+    slice_sample(n = 50000) |>
+    mutate(station_id = future_map2_chr(latitude, longitude, stationsGetClosest))
+}
 ```
 
 # Data cleaning
 ```{r}
-df <- df |>
-      drop_na()
 
 
-df <- df |>
-      left_join(stations, by=join_by(start_station_id == station_id))#, suffix = c("original","started"), relationship="many-to-one") #|>
-      left_join(stations, by=join_by(end_station_id == station_id), suffix = c("original","ended")) 
-#graoh <- ggplot(data = df) +
+# graoh <- ggplot(data = df) +
 #  aes(x = member_casual, fill = rideable_type) +
 #  geom_bar()
 #
-#distm_v   <-  Vectorize(function(x1,y1,x2,y2) {
+# distm_v   <-  Vectorize(function(x1,y1,x2,y2) {
 #  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
-#}
-#)
+# }
+# )
 #
-#data  <- df |>
+# data  <- df |>
 #  mutate(distance = distm_v(end_lng, end_lat, start_lng, end_lat), time = as.integer(ended_at - started_at)) |>
 #  mutate(avg_velocity = distance/ time) |>
 #  select(ride_id, start_station_id, started_at, time, distance, member_casual, rideable_type, start_lng, start_lat, avg_velocity)
 #
-#visual  <- data |>
+# visual  <- data |>
 #  select(member_casual, avg_velocity, distance, time) |>
 #  group_by(member_casual) |>
 #  summarise(avg_time_used = mean(time), avg_distance = mean(distance), count = n())
 #
-#p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
+# p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 #
-#p1  <- ggplot(data = visual) + aes(x = member_casual, y= avg_distance) + geom_col()
+# p1  <- ggplot(data = visual) + aes(x = member_casual, y= avg_distance) + geom_col()
 #
-#p2  <- ggplot(data = visual) + aes(x = member_casual, y= count) + geom_col()
+# p2  <- ggplot(data = visual) + aes(x = member_casual, y= count) + geom_col()
 #
-#p
-#p1
-#p2
+# p
+# p1
+# p2
 #
-#ggplot(data=data) + aes(x = distance) + geom_histogram(bins=60) + facet_grid(vars(member_casual))
-#per_hour_day  <- ggplot(data=data) + aes(x = hour(started_at)) + geom_histogram(bins = 24, fill = 'lightblue', color = 'darkblue') + facet_grid(cols=vars(member_casual), rows=vars(wday(started_at, week_start = 1, label = TRUE, abbr = FALSE))) + labs(title = 'Rides per hour of day', subtitle='Data from Agust 2024', x='Hour',y='Number of rides')+  theme_linedraw()
-#per_day <-  ggplot(data=data) + aes(x = wday(started_at, week_start = 1), fill = rideable_type) + geom_histogram() + facet_grid(cols=vars(member_casual), rows =vars(week(started_at))) + labs(x='day of the week', title = 'Rides per day of the week', subtitle = 'Data from Agust, 2024', y = 'Number of rides') + theme_linedraw()
-#ggplot(data=filter(data, time < 3000)) + aes(x=hms::as_hms(started_at), y=time, colour=rideable_type) + geom_point() + facet_grid(rows=vars(wday(started_at)), cols=vars(member_casual))
-#per_day
-#per_hour_day
+# ggplot(data=data) + aes(x = distance) + geom_histogram(bins=60) + facet_grid(vars(member_casual))
+# per_hour_day  <- ggplot(data=data) + aes(x = hour(started_at)) + geom_histogram(bins = 24, fill = 'lightblue', color = 'darkblue') + facet_grid(cols=vars(member_casual), rows=vars(wday(started_at, week_start = 1, label = TRUE, abbr = FALSE))) + labs(title = 'Rides per hour of day', subtitle='Data from Agust 2024', x='Hour',y='Number of rides')+  theme_linedraw()
+# per_day <-  ggplot(data=data) + aes(x = wday(started_at, week_start = 1), fill = rideable_type) + geom_histogram() + facet_grid(cols=vars(member_casual), rows =vars(week(started_at))) + labs(x='day of the week', title = 'Rides per day of the week', subtitle = 'Data from Agust, 2024', y = 'Number of rides') + theme_linedraw()
+# ggplot(data=filter(data, time < 3000)) + aes(x=hms::as_hms(started_at), y=time, colour=rideable_type) + geom_point() + facet_grid(rows=vars(wday(started_at)), cols=vars(member_casual))
+# per_day
+# per_hour_day
 #
-#data |>
+# data |>
 #  select(started_at, time) |>
 #  mutate(hour = hour(started_at), day  )
 #
-#ggplot() + aes(x=distance, y=time, colour=rideable_type  )+ geom_point()
-#data |> slice_min(time)
-#glimpse(data)
-#map  <- data |>
+# ggplot() + aes(x=distance, y=time, colour=rideable_type  )+ geom_point()
+# data |> slice_min(time)
+# glimpse(data)
+# map  <- data |>
 #  group_by(start_station_id, start_lng, start_lat, member_casual, rideable_type) |>
 #  summarise(avg_dist = mean(distance), avg_time = mean (time), rides = n(), avg_vel = mean(avg_velocity), .groups = "keep")
 #
-#pos  <- map |>
+# pos  <- map |>
 #  arrange(desc(avg_dist))
 #
 #
-#loc_sf  <- st_as_sf(map, coords = c('start_lng', 'start_lat')) 
-#st_crs(loc_sf) = 4236 
+# loc_sf  <- st_as_sf(map, coords = c('start_lng', 'start_lat'))
+# st_crs(loc_sf) = 4236
 #
-#mapview(loc_sf, zcol='rides')
-#mapview(loc_sf, zcol='avg_dist')
+# mapview(loc_sf, zcol='rides')
+# mapview(loc_sf, zcol='avg_dist')
 #
 #
 ```
