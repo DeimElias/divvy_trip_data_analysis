@@ -1,11 +1,23 @@
 ---
-title: Cyclist data analysis
+title: Divvy case study
 format: gfm
 ---
 
-# Preparing control
+# Introduction
 
-First, we will prepare the necesary libraries to make an initial exploration.
+In this case study we take a look at the dataset provided by Divvy, a company 
+that is in the bussiness of rent bicycles. We try to find useful insights about
+diiferences between members and casual users of the service, so that the marketing 
+team could use them to better fit a marketing campain to persuade casual user to 
+buy the membership. While doing that, we will answer the following the folowing questions:
+
+ - Is the dataset viable to acomplish the goal?
+ - Does the dataset need cleaning to ensure its reliability?
+ - What are the main differences between those groups (members and casuals) that the dataset shows us?
+ - How can we explain those differents? is this information in the dataset?
+# Setting up packages
+
+First, we will setup all the R packages that we will use.
 
 ```{r}
 library(tidyverse)
@@ -28,7 +40,7 @@ for (date in dates) {
     link <- sprintf("https://divvy-tripdata.s3.amazonaws.com/%s", file)
     download.file(link, file)
   }
-  df <- df |> bind_rows(read_csv(file))
+  df <- df |> bind_rows(read_csv(file, show_col_types = FALSE))
 }
 ```
 # Exploratory face
@@ -76,7 +88,9 @@ Looking at the page from divvy, we could obtain the exact location of the statio
 
 ```{r} 
 stations_json <- "stations.json"
-download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
+if (!file.exists(stations_json)) {
+  download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
+}
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
@@ -92,9 +106,10 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 
 assert.value <- function(value) {
   if (dim(value)[1] == 0) {
-    return(tibble(station_id = ""))
-  }
+    tibble(station_id = "")
+  } else {
   value
+  }
 }
 
 closestStationMargin <- function(margin) {

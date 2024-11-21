@@ -1,7 +1,19 @@
 # Cyclist data analysis
 
 
-# Preparing control
+# Introduction
+
+In this case study we take a look at the dataset provided by Divvy, a
+company that is in the bussiness of rent bicycles. We try to find useful
+insights about diiferences between members and casual users of the
+service, so that the marketing team could use them to better fit a
+marketing campain to persuade casual user to buy the membership. While
+doing that, we will answer the following the folowing questions:
+
+- Is the dataset viable to acomplish the goal?
+- Does the dataset need cleaning to ensure it’s reliability
+
+# Setting up packages
 
 First, we will prepare the necesary libraries to make an initial
 exploration.
@@ -58,130 +70,22 @@ for (date in dates) {
     link <- sprintf("https://divvy-tripdata.s3.amazonaws.com/%s", file)
     download.file(link, file)
   }
-  df <- df |> bind_rows(read_csv(file))
+  df <- df |> bind_rows(read_csv(file, show_col_types = FALSE))
 }
 ```
 
     Multiple files in zip: reading '202310-divvy-tripdata.csv'
-    Rows: 537113 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202311-divvy-tripdata.csv'
-    Rows: 362518 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202312-divvy-tripdata.csv'
-    Rows: 224073 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202401-divvy-tripdata.csv'
-    Rows: 144873 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202402-divvy-tripdata.csv'
-    Rows: 223164 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202403-divvy-tripdata.csv'
-    Rows: 301687 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202404-divvy-tripdata.csv'
-    Rows: 415025 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202405-divvy-tripdata.csv'
-    Rows: 609493 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202406-divvy-tripdata.csv'
-    Rows: 710721 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202407-divvy-tripdata.csv'
-    Rows: 748962 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202408-divvy-tripdata.csv'
-    Rows: 755639 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
     Multiple files in zip: reading '202409-divvy-tripdata.csv'
-    Rows: 821276 Columns: 13
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr  (7): ride_id, rideable_type, start_station_name, start_station_id, end_...
-    dbl  (4): start_lat, start_lng, end_lat, end_lng
-    dttm (2): started_at, ended_at
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 # Exploratory face
 
@@ -311,7 +215,9 @@ location of the stations, let’s incorporate that
 
 ``` r
 stations_json <- "stations.json"
-download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
+if (!file.exists(stations_json)) {
+  download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
+}
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
@@ -324,16 +230,16 @@ stations
     # A tibble: 1,801 × 5
        station_id                           name                  lon   lat distance
        <chr>                                <chr>               <dbl> <dbl>    <dbl>
-     1 2010820263334840794                  Panama Ave & Grace… -87.8  41.9      1.1
-     2 1991508150894459550                  State St & 111th St -87.6  41.7      1.1
-     3 1966307477149012058                  Mozart St & 55th St -87.7  41.8      1.1
-     4 a3af9a83-a135-11e9-9cda-0a87ae2ba916 Drake Ave & Montro… -87.7  42.0      1.1
-     5 a3afd294-a135-11e9-9cda-0a87ae2ba916 Troy St & Elston A… -87.7  41.9      1.1
-     6 a3a97a01-a135-11e9-9cda-0a87ae2ba916 Cottage Grove Ave … -87.6  41.8      1.1
-     7 1929967657204564894                  Kedvale Ave & Pete… -87.7  42.0      1.1
-     8 1978857650118994914                  Indiana Ave & 133r… -87.6  41.7      1.1
-     9 a3a96aca-a135-11e9-9cda-0a87ae2ba916 Halsted St & 37th … -87.6  41.8      1.1
-    10 a3ad13e4-a135-11e9-9cda-0a87ae2ba916 Shields Ave & 28th… -87.6  41.8      1.1
+     1 1955905507044284968                  Nordica Ave & Medi… -87.8  41.9      1.1
+     2 1934289361049585738                  California Ave & 3… -87.7  41.8      1.1
+     3 a3b0fae6-a135-11e9-9cda-0a87ae2ba916 Glenwood Ave & Tou… -87.7  42.0      1.1
+     4 a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 Woodlawn Ave & Lak… -87.6  41.8      1.1
+     5 a3acdae2-a135-11e9-9cda-0a87ae2ba916 Wentworth Ave & 63… -87.6  41.8      1.1
+     6 a3a9f76a-a135-11e9-9cda-0a87ae2ba916 Kedzie Ave & Palme… -87.7  41.9      1.1
+     7 a3af5d1c-a135-11e9-9cda-0a87ae2ba916 Western Ave & Lunt… -87.7  42.0      1.1
+     8 a3a8999a-a135-11e9-9cda-0a87ae2ba916 Montrose Harbor     -87.6  42.0      1.1
+     9 a3ad2d57-a135-11e9-9cda-0a87ae2ba916 State St & Pershin… -87.6  41.8      1.1
+    10 1936552461714393094                  St Louis Ave & 59t… -87.7  41.8      1.1
     # ℹ 1,791 more rows
 
 ``` r
@@ -343,9 +249,10 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 
 assert.value <- function(value) {
   if (dim(value)[1] == 0) {
-    return(tibble(station_id = ""))
-  }
+    tibble(station_id = "")
+  } else {
   value
+  }
 }
 
 closestStationMargin <- function(margin) {
