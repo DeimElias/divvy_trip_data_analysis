@@ -1,4 +1,4 @@
-# Cyclist data analysis
+# Divvy case study
 
 
 # Introduction
@@ -11,12 +11,13 @@ marketing campain to persuade casual user to buy the membership. While
 doing that, we will answer the following the folowing questions:
 
 - Is the dataset viable to acomplish the goal?
-- Does the dataset need cleaning to ensure it’s reliability
+- Does the dataset need cleaning to ensure its reliability?
+- What are the main differences between those groups (members and
+  casuals) that the dataset shows us?
+- How can we explain those differents? is this information in the
+  dataset? \# Setting up packages
 
-# Setting up packages
-
-First, we will prepare the necesary libraries to make an initial
-exploration.
+First, we will setup all the R packages that we will use.
 
 ``` r
 library(tidyverse)
