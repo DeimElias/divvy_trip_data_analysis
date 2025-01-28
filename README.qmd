@@ -6,15 +6,16 @@ format: gfm
 # Introduction
 
 In this case study we take a look at the dataset provided by Divvy, a company 
-that is in the bussiness of rent bicycles. We try to find useful insights about
-diiferences between members and casual users of the service, so that the marketing 
-team could use them to better fit a marketing campain to persuade casual user to 
-buy the membership. While doing that, we will answer the following the folowing questions:
+that is in the bussiness of bycicle rent. We will try to find useful insights about
+diiferences between members and casual users of the service that the marketing 
+team could use find useful to develop better marketing campaings to persuade casual user to 
+become members of the service. In order to do this we will focus on the next questions:
 
- - Is the dataset viable to acomplish the goal?
- - Does the dataset need cleaning to ensure its reliability?
- - What are the main differences between those groups (members and casuals) that the dataset shows us?
- - How can we explain those differents? is this information in the dataset?
+ - What are the problems the dataset presents? Is there any way to overcome or mitigate those problems?
+ - Are there any clear distinction between members and casual users of the service that could be helpful?
+ - What suggestions could be made to the marketing team?
+
+With those goals setted, we can start our analisys of the data. 
 # Setting up packages
 
 First, we will setup all the R packages that we will use.
@@ -29,7 +30,7 @@ library(geosphere)
 library(furrr)
 ```
 
-Loading data from source if not available locally.
+Loading data from source, if not it is available locally.
 
 ```{r}
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
@@ -60,10 +61,16 @@ df |>
 
 colSums(is.na(df))
 ```
+The dataset has colums with 18% of their content missing. Since those colums are
+the name or the id of the stations, we can try to obtain that information from other sources.
+Also, there are some rows that does not have their geografical info on where the ride ended, let's have
+a look at those.
 
-We have almost 20% of colums with NA values. We could drop them, since our sample would still be big enough\
-Although, we could try to save some of them. Since most of them come from missing information from stations.
-We have some colums that represent geographical data from our stations, lets have a deeper look at them.
+```{r} 
+df |>
+  filter(is.na(end_lng)) |>
+  ggplot() + aes(x = mday(started_at)) + geom_histogram(bins = 31)
+```
 
 ```{r}
 df |>
