@@ -4,18 +4,20 @@
 # Introduction
 
 In this case study we take a look at the dataset provided by Divvy, a
-company that is in the bussiness of rent bicycles. We try to find useful
-insights about diiferences between members and casual users of the
-service, so that the marketing team could use them to better fit a
-marketing campain to persuade casual user to buy the membership. While
-doing that, we will answer the following the folowing questions:
+company that is in the bussiness of bycicle rent. We will try to find
+useful insights about diiferences between members and casual users of
+the service that the marketing team could use find useful to develop
+better marketing campaings to persuade casual user to become members of
+the service. In order to do this we will focus on the next questions:
 
-- Is the dataset viable to acomplish the goal?
-- Does the dataset need cleaning to ensure its reliability?
-- What are the main differences between those groups (members and
-  casuals) that the dataset shows us?
-- How can we explain those differents? is this information in the
-  dataset? \# Setting up packages
+- What are the problems the dataset presents? Is there any way to
+  overcome or mitigate those problems?
+- Are there any clear distinction between members and casual users of
+  the service that could be helpful?
+- What suggestions could be made to the marketing team?
+
+With those goals setted, we can start our analisys of the data. \#
+Setting up packages
 
 First, we will setup all the R packages that we will use.
 
@@ -23,16 +25,16 @@ First, we will setup all the R packages that we will use.
 library(tidyverse)
 ```
 
-    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-    ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-    ✔ purrr     1.0.2     
-    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ✖ dplyr::filter() masks stats::filter()
-    ✖ dplyr::lag()    masks stats::lag()
-    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+    -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+    v dplyr     1.1.4     v readr     2.1.5
+    v forcats   1.0.0     v stringr   1.5.1
+    v ggplot2   3.5.1     v tibble    3.2.1
+    v lubridate 1.9.3     v tidyr     1.3.1
+    v purrr     1.0.2     
+    -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+    x dplyr::filter() masks stats::filter()
+    x dplyr::lag()    masks stats::lag()
+    i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 ``` r
 library(mapview)
@@ -40,14 +42,14 @@ library(lubridate)
 library(sf)
 ```
 
-    Linking to GEOS 3.12.2, GDAL 3.8.5, PROJ 9.3.1; sf_use_s2() is TRUE
+    Linking to GEOS 3.13.0, GDAL 3.9.3, PROJ 9.5.0; sf_use_s2() is TRUE
 
 ``` r
 library(jsonlite)
 ```
 
 
-    Adjuntando el paquete: 'jsonlite'
+    Attaching package: 'jsonlite'
 
     The following object is masked from 'package:purrr':
 
@@ -58,9 +60,9 @@ library(geosphere)
 library(furrr)
 ```
 
-    Cargando paquete requerido: future
+    Loading required package: future
 
-Loading data from source if not available locally.
+Loading data from source, if not it is available locally.
 
 ``` r
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
@@ -96,7 +98,7 @@ Read file as a tibble and first look at data.
 head(df)
 ```
 
-    # A tibble: 6 × 13
+    # A tibble: 6 x 13
       ride_id          rideable_type started_at          ended_at           
       <chr>            <chr>         <dttm>              <dttm>             
     1 4449097279F8BBE7 classic_bike  2023-10-08 10:36:26 2023-10-08 10:49:19
@@ -105,7 +107,7 @@ head(df)
     4 F92714CC6B019B96 classic_bike  2023-10-24 19:13:03 2023-10-24 19:18:29
     5 5E34BA5DE945A9CC classic_bike  2023-10-09 18:19:26 2023-10-09 18:30:56
     6 F7D7420AFAC53CD9 electric_bike 2023-10-04 17:10:59 2023-10-04 17:25:21
-    # ℹ 9 more variables: start_station_name <chr>, start_station_id <chr>,
+    # i 9 more variables: start_station_name <chr>, start_station_id <chr>,
     #   end_station_name <chr>, end_station_id <chr>, start_lat <dbl>,
     #   start_lng <dbl>, end_lat <dbl>, end_lng <dbl>, member_casual <chr>
 
@@ -174,12 +176,19 @@ colSums(is.na(df))
          member_casual 
                      0 
 
-We have almost 20% of colums with NA values. We could drop them, since
-our sample would still be big enough  
-Although, we could try to save some of them. Since most of them come
-from missing information from stations. We have some colums that
-represent geographical data from our stations, lets have a deeper look
-at them.
+The dataset has colums with 18% of their content missing. Since those
+colums are the name or the id of the stations, we can try to obtain that
+information from other sources. Also, there are some rows that does not
+have their geografical info on where the ride ended, let’s have a look
+at those.
+
+``` r
+df |>
+  filter(is.na(end_lng)) |>
+  ggplot() + aes(x = mday(started_at)) + geom_histogram(bins = 31)
+```
+
+![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
 
 ``` r
 df |>
@@ -228,20 +237,20 @@ stations <- fromJSON(stations_json) |>
 stations
 ```
 
-    # A tibble: 1,801 × 5
+    # A tibble: 1,801 x 5
        station_id                           name                  lon   lat distance
        <chr>                                <chr>               <dbl> <dbl>    <dbl>
-     1 1955905507044284968                  Nordica Ave & Medi… -87.8  41.9      1.1
-     2 1934289361049585738                  California Ave & 3… -87.7  41.8      1.1
-     3 a3b0fae6-a135-11e9-9cda-0a87ae2ba916 Glenwood Ave & Tou… -87.7  42.0      1.1
-     4 a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 Woodlawn Ave & Lak… -87.6  41.8      1.1
-     5 a3acdae2-a135-11e9-9cda-0a87ae2ba916 Wentworth Ave & 63… -87.6  41.8      1.1
-     6 a3a9f76a-a135-11e9-9cda-0a87ae2ba916 Kedzie Ave & Palme… -87.7  41.9      1.1
-     7 a3af5d1c-a135-11e9-9cda-0a87ae2ba916 Western Ave & Lunt… -87.7  42.0      1.1
+     1 1955905507044284968                  Nordica Ave & Medi~ -87.8  41.9      1.1
+     2 1934289361049585738                  California Ave & 3~ -87.7  41.8      1.1
+     3 a3b0fae6-a135-11e9-9cda-0a87ae2ba916 Glenwood Ave & Tou~ -87.7  42.0      1.1
+     4 a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 Woodlawn Ave & Lak~ -87.6  41.8      1.1
+     5 a3acdae2-a135-11e9-9cda-0a87ae2ba916 Wentworth Ave & 63~ -87.6  41.8      1.1
+     6 a3a9f76a-a135-11e9-9cda-0a87ae2ba916 Kedzie Ave & Palme~ -87.7  41.9      1.1
+     7 a3af5d1c-a135-11e9-9cda-0a87ae2ba916 Western Ave & Lunt~ -87.7  42.0      1.1
      8 a3a8999a-a135-11e9-9cda-0a87ae2ba916 Montrose Harbor     -87.6  42.0      1.1
-     9 a3ad2d57-a135-11e9-9cda-0a87ae2ba916 State St & Pershin… -87.6  41.8      1.1
-    10 1936552461714393094                  St Louis Ave & 59t… -87.7  41.8      1.1
-    # ℹ 1,791 more rows
+     9 a3ad2d57-a135-11e9-9cda-0a87ae2ba916 State St & Pershin~ -87.6  41.8      1.1
+    10 1936552461714393094                  St Louis Ave & 59t~ -87.7  41.8      1.1
+    # i 1,791 more rows
 
 ``` r
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
@@ -288,13 +297,13 @@ stations.with.id <- if (file.exists("coords_with_names.csv")) {
 ```
 
     Rows: 1343123 Columns: 3
-    ── Column specification ────────────────────────────────────────────────────────
+    -- Column specification --------------------------------------------------------
     Delimiter: ","
     chr (1): station_id
     dbl (2): latitude, longitude
 
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    i Use `spec()` to retrieve the full column specification for this data.
+    i Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 # Data cleaning
 
