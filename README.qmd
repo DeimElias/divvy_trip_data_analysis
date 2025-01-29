@@ -96,14 +96,15 @@ df |>
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
   labs(x = "Day of month", y = "Number of rides", title = "Nunber of rides with missing geografical location", subtitle = "by day of month")
 ```
-We can't see anything that suggest a definite conclution. Since we can't confidently
+We can't see anything that suggest anything conclusive. Since we can't confidently
 recover the data lost, we sould drop those entries.
 
 ```{r}
 df <- filter(df, !is.na(end_lng))
 colSums(is.na(df))
 ```
-
+The other data that is missing is naming and id info from the stations. We can check if we can fill
+the missing data with other entries that have the same geographical information.
 ```{r}
 df |>
   select(start_station_id) |>
@@ -122,7 +123,7 @@ df |>
 ```
 
 We can deduce that this dataset has multiple values for some stations. Altought this could be intented 
-(to have precise data on where was the bycicle taken/returned), we are not interested in those especifics, lets fix them.
+(to have precise data on where was the bycicle taken/returned), we are not interested in those especifics, we should also fix this.
 Looking at the page from divvy, we could obtain the exact location of the stations, let's incorporate that
 
 ```{r} 
@@ -134,11 +135,41 @@ stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
   select(station_id, name, lon, lat) |>
-  mutate(distance = 1.1)
+  mutate(distance = 1.1, lat=num(lat,digits=6), lon=num(lon, digits = 6))
 
-stations
+stations |>
+  distinct(station_id)|>
+  dim()
 
+stations |>
+  distinct(lat, lon) |>
+  dim()
 
+stations |>
+  group_by(lat, lon) |>
+  filter(n() > 1) |>
+  ungroup() 
+
+stations |>
+  group_by(name) |>
+  filter(n() > 1) |>
+  ungroup()
+
+```
+This data is mostly clean, just some typos in the system that are an easy fix. Since I can count those errors
+with one hand, I manually check them on Google Maps. Here are my findings:
+
+  - Wilton Ave & Diversey Pkwy has many places to park, maybe the company takes those as 2 different stations
+  - Forest Glen station and Peterson Park are 2 stations that are just a meter or 2 of distance, we can consider both as one station
+  - Laflin St & 51st St appears to be a typo, since there is just one station nerby.
+
+We will proceed as follows
+```{r}
+stations |>
+  filter(station_id=='a3a3a282-a135-11e9-9cda-0a87ae2ba916' | station_id=='')
+```
+Awesome, now we have a clean dataset of the stations info
+```{r}
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })

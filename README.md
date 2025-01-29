@@ -217,7 +217,7 @@ df |>
 
 ![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
 
-We can’t see anything that suggest a definite conclution. Since we can’t
+We can’t see anything that suggest anything conclusive. Since we can’t
 confidently recover the data lost, we sould drop those entries.
 
 ``` r
@@ -233,6 +233,10 @@ colSums(is.na(df))
                      0                  0                  0                  0 
          member_casual 
                      0 
+
+The other data that is missing is naming and id info from the stations.
+We can check if we can fill the missing data with other entries that
+have the same geographical information.
 
 ``` r
 df |>
@@ -263,9 +267,9 @@ df |>
 
 We can deduce that this dataset has multiple values for some stations.
 Altought this could be intented (to have precise data on where was the
-bycicle taken/returned), we are not interested in those especifics, lets
-fix them. Looking at the page from divvy, we could obtain the exact
-location of the stations, let’s incorporate that
+bycicle taken/returned), we are not interested in those especifics, we
+should also fix this. Looking at the page from divvy, we could obtain
+the exact location of the stations, let’s incorporate that
 
 ``` r
 stations_json <- "stations.json"
@@ -276,25 +280,81 @@ stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
   select(station_id, name, lon, lat) |>
-  mutate(distance = 1.1)
+  mutate(distance = 1.1, lat=num(lat,digits=6), lon=num(lon, digits = 6))
 
-stations
+stations |>
+  distinct(station_id)|>
+  dim()
 ```
 
-    # A tibble: 1,801 x 5
-       station_id                           name                  lon   lat distance
-       <chr>                                <chr>               <dbl> <dbl>    <dbl>
-     1 1955905507044284968                  Nordica Ave & Medi~ -87.8  41.9      1.1
-     2 1934289361049585738                  California Ave & 3~ -87.7  41.8      1.1
-     3 a3b0fae6-a135-11e9-9cda-0a87ae2ba916 Glenwood Ave & Tou~ -87.7  42.0      1.1
-     4 a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 Woodlawn Ave & Lak~ -87.6  41.8      1.1
-     5 a3acdae2-a135-11e9-9cda-0a87ae2ba916 Wentworth Ave & 63~ -87.6  41.8      1.1
-     6 a3a9f76a-a135-11e9-9cda-0a87ae2ba916 Kedzie Ave & Palme~ -87.7  41.9      1.1
-     7 a3af5d1c-a135-11e9-9cda-0a87ae2ba916 Western Ave & Lunt~ -87.7  42.0      1.1
-     8 a3a8999a-a135-11e9-9cda-0a87ae2ba916 Montrose Harbor     -87.6  42.0      1.1
-     9 a3ad2d57-a135-11e9-9cda-0a87ae2ba916 State St & Pershin~ -87.6  41.8      1.1
-    10 1936552461714393094                  St Louis Ave & 59t~ -87.7  41.8      1.1
-    # i 1,791 more rows
+    [1] 1801    1
+
+``` r
+stations |>
+  distinct(lat, lon) |>
+  dim()
+```
+
+    [1] 1798    2
+
+``` r
+stations |>
+  group_by(lat, lon) |>
+  filter(n() > 1) |>
+  ungroup() 
+```
+
+    # A tibble: 6 x 5
+      station_id                           name               lon       lat distance
+      <chr>                                <chr>        <num:.6!> <num:.6!>    <dbl>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 "Wilton Av~ -87.652705 41.932418      1.1
+    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 "Wilton Av~ -87.652705 41.932418      1.1
+    3 1827484051430132402                  "Public Ra~ -87.755520 41.978710      1.1
+    4 1715823821144840768                  "Public Ra~ -87.662076 41.801354      1.1
+    5 1677249871073777806                  "Public Ra~ -87.662076 41.801354      1.1
+    6 1827474404723843690                  "Public Ra~ -87.755520 41.978710      1.1
+
+``` r
+stations |>
+  group_by(name) |>
+  filter(n() > 1) |>
+  ungroup()
+```
+
+    # A tibble: 6 x 5
+      station_id          name                          lon       lat distance
+      <chr>               <chr>                   <num:.6!> <num:.6!>    <dbl>
+    1 1978857650118994914 Indiana Ave & 133rd St -87.617190 41.653800      1.1
+    2 1967727360320698512 Western Ave & Lake St  -87.686680 41.884810      1.1
+    3 1984042930424753006 Steelworkers Park      -87.530910 41.737930      1.1
+    4 1448642188027369086 Indiana Ave & 133rd St -87.617054 41.653564      1.1
+    5 1594046379513303720 Western Ave & Lake St  -87.685853 41.884606      1.1
+    6 1448642188027369090 Steelworkers Park      -87.531067 41.738246      1.1
+
+This data is mostly clean, just some typos in the system that are an
+easy fix. Since I can count those errors with one hand, I manually check
+them on Google Maps. Here are my findings:
+
+- Wilton Ave & Diversey Pkwy has many places to park, maybe the company
+  takes those as 2 different stations
+- Forest Glen station and Peterson Park are 2 stations that are just a
+  meter or 2 of distance, we can consider both as one station
+- Laflin St & 51st St appears to be a typo, since there is just one
+  station nerby.
+
+We will proceed as follows
+
+``` r
+stations |>
+  filter(station_id=='a3a3a282-a135-11e9-9cda-0a87ae2ba916' | station_id=='')
+```
+
+    # A tibble: 1 x 5
+      station_id                           name               lon       lat distance
+      <chr>                                <chr>        <num:.6!> <num:.6!>    <dbl>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 Wilton Ave~ -87.652705 41.932418      1.1
+
+Awesome, now we have a clean dataset of the stations info
 
 ``` r
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
