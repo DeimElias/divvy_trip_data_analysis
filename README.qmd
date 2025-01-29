@@ -66,12 +66,33 @@ the name or the id of the stations, we can try to obtain that information from o
 Also, there are some rows that does not have their geografical info on where the ride ended, let's have
 a look at those.
 
+One may suspect that the rides that have missing end  latitude and longitude would be at the end of the month,
+thinking of this cut on the dataset publishing as the main source of missing information. Let's check a graph that could 
+sustent this hipothesys
 ```{r} 
+global_theme <-  function() {
+  theme_linedraw() +
+  theme(axis.text.y = element_blank(),
+    axis.text.x = element_text(colour = 'white'),
+    axis.title.y = element_text(colour ='white'), 
+    axis.title.x = element_text(colour ='white'),
+    plot.title = element_text(colour = 'white'),
+    plot.subtitle = element_text(colour = 'white'),
+    strip.background = element_rect(fill = "#53495C", colour = "black"),
+    strip.text = element_text(colour = "white"), 
+    panel.background = element_rect(fill = "#232323", colour = "black"), 
+    plot.background = element_rect(fill = "#292929"))
+}
+
 df |>
   filter(is.na(end_lng)) |>
-  ggplot() + aes(x = mday(started_at)) + geom_histogram(bins = 31)
+  ggplot() +
+  aes(x = mday(started_at)) +
+  geom_histogram(bins = 31, color = "#9E55FC", fill = "#BB86FC") +
+  global_theme() +
+  facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
+  labs(x = "Day of month", y = "Number of rides", title = "Nunber of rides with missing geografical location", subtitle = "by day of month")
 ```
-
 ```{r}
 df |>
   select(start_station_id) |>
@@ -115,7 +136,7 @@ assert.value <- function(value) {
   if (dim(value)[1] == 0) {
     tibble(station_id = "")
   } else {
-  value
+    value
   }
 }
 
@@ -152,8 +173,6 @@ stations.with.id <- if (file.exists("coords_with_names.csv")) {
 
 # Data cleaning
 ```{r}
-
-
 # graoh <- ggplot(data = df) +
 #  aes(x = member_casual, fill = rideable_type) +
 #  geom_bar()
