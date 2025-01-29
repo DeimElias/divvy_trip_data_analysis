@@ -176,19 +176,63 @@ colSums(is.na(df))
          member_casual 
                      0 
 
+# Data cleaning
+
 The dataset has colums with 18% of their content missing. Since those
 colums are the name or the id of the stations, we can try to obtain that
 information from other sources. Also, there are some rows that does not
 have their geografical info on where the ride ended, let’s have a look
 at those.
 
+One may suspect that the rides that have missing end latitude and
+longitude would be at the end of the month, thinking of this cut on the
+dataset publishing as the main source of missing information. Let’s
+check a graph that could sustent this hipothesys
+
 ``` r
+global_theme <-  function() {
+  theme_linedraw() +
+  theme(axis.text.y = element_blank(),
+    axis.text.x = element_text(colour = 'white', face = 'bold'),
+    axis.title.y = element_text(colour ='white', face = 'bold'), 
+    axis.title.x = element_text(colour ='white', face = 'bold'),
+    plot.title = element_text(colour = 'white', face = 'bold'),
+    plot.subtitle = element_text(colour = 'white', face = 'bold'),
+    strip.background = element_rect(fill = "#262852", color='#262852'),
+    strip.placement = "inside",
+    strip.text = element_text(colour = "white", face = 'bold'), 
+    panel.background = element_rect(fill = "#262852"), 
+    plot.background = element_rect(fill = "#150F3A"))
+}
+
 df |>
   filter(is.na(end_lng)) |>
-  ggplot() + aes(x = mday(started_at)) + geom_histogram(bins = 31)
+  ggplot() +
+  aes(x = mday(started_at)) +
+  geom_histogram(bins = 31, color = "#07D0FF", fill = "#06CEFD") +
+  global_theme() +
+  facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
+  labs(x = "Day of month", y = "Number of rides", title = "Nunber of rides with missing geografical location", subtitle = "by day of month")
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
+
+We can’t see anything that suggest a definite conclution. Since we can’t
+confidently recover the data lost, we sould drop those entries.
+
+``` r
+df <- filter(df, !is.na(end_lng))
+colSums(is.na(df))
+```
+
+               ride_id      rideable_type         started_at           ended_at 
+                     0                  0                  0                  0 
+    start_station_name   start_station_id   end_station_name     end_station_id 
+               1056535            1056535            1084351            1084351 
+             start_lat          start_lng            end_lat            end_lng 
+                     0                  0                  0                  0 
+         member_casual 
+                     0 
 
 ``` r
 df |>
@@ -261,7 +305,7 @@ assert.value <- function(value) {
   if (dim(value)[1] == 0) {
     tibble(station_id = "")
   } else {
-  value
+    value
   }
 }
 

@@ -61,6 +61,8 @@ df |>
 
 colSums(is.na(df))
 ```
+
+# Data cleaning
 The dataset has colums with 18% of their content missing. Since those colums are
 the name or the id of the stations, we can try to obtain that information from other sources.
 Also, there are some rows that does not have their geografical info on where the ride ended, let's have
@@ -73,26 +75,35 @@ sustent this hipothesys
 global_theme <-  function() {
   theme_linedraw() +
   theme(axis.text.y = element_blank(),
-    axis.text.x = element_text(colour = 'white'),
-    axis.title.y = element_text(colour ='white'), 
-    axis.title.x = element_text(colour ='white'),
-    plot.title = element_text(colour = 'white'),
-    plot.subtitle = element_text(colour = 'white'),
-    strip.background = element_rect(fill = "#53495C", colour = "black"),
-    strip.text = element_text(colour = "white"), 
-    panel.background = element_rect(fill = "#232323", colour = "black"), 
-    plot.background = element_rect(fill = "#292929"))
+    axis.text.x = element_text(colour = 'white', face = 'bold'),
+    axis.title.y = element_text(colour ='white', face = 'bold'), 
+    axis.title.x = element_text(colour ='white', face = 'bold'),
+    plot.title = element_text(colour = 'white', face = 'bold'),
+    plot.subtitle = element_text(colour = 'white', face = 'bold'),
+    strip.background = element_rect(fill = "#262852", color='#262852'),
+    strip.placement = "inside",
+    strip.text = element_text(colour = "white", face = 'bold'), 
+    panel.background = element_rect(fill = "#262852"), 
+    plot.background = element_rect(fill = "#150F3A"))
 }
 
 df |>
   filter(is.na(end_lng)) |>
   ggplot() +
   aes(x = mday(started_at)) +
-  geom_histogram(bins = 31, color = "#9E55FC", fill = "#BB86FC") +
+  geom_histogram(bins = 31, color = "#07D0FF", fill = "#06CEFD") +
   global_theme() +
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
   labs(x = "Day of month", y = "Number of rides", title = "Nunber of rides with missing geografical location", subtitle = "by day of month")
 ```
+We can't see anything that suggest a definite conclution. Since we can't confidently
+recover the data lost, we sould drop those entries.
+
+```{r}
+df <- filter(df, !is.na(end_lng))
+colSums(is.na(df))
+```
+
 ```{r}
 df |>
   select(start_station_id) |>
