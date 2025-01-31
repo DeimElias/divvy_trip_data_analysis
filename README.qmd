@@ -16,6 +16,7 @@ become members of the service. In order to do this we will focus on the next que
  - What suggestions could be made to the marketing team?
 
 With those goals setted, we can start our analisys of the data. 
+
 # Setting up packages
 
 First, we will setup all the R packages that we will use.

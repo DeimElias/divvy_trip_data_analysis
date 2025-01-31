@@ -310,8 +310,8 @@ stations |>
     1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 "Wilton Av~ -87.652705 41.932418      1.1
     2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 "Wilton Av~ -87.652705 41.932418      1.1
     3 1827484051430132402                  "Public Ra~ -87.755520 41.978710      1.1
-    4 1715823821144840768                  "Public Ra~ -87.662076 41.801354      1.1
-    5 1677249871073777806                  "Public Ra~ -87.662076 41.801354      1.1
+    4 1677249871073777806                  "Public Ra~ -87.662076 41.801354      1.1
+    5 1715823821144840768                  "Public Ra~ -87.662076 41.801354      1.1
     6 1827474404723843690                  "Public Ra~ -87.755520 41.978710      1.1
 
 ``` r
@@ -324,12 +324,12 @@ stations |>
     # A tibble: 6 x 5
       station_id          name                          lon       lat distance
       <chr>               <chr>                   <num:.6!> <num:.6!>    <dbl>
-    1 1978857650118994914 Indiana Ave & 133rd St -87.617190 41.653800      1.1
-    2 1967727360320698512 Western Ave & Lake St  -87.686680 41.884810      1.1
+    1 1967727360320698512 Western Ave & Lake St  -87.686680 41.884810      1.1
+    2 1978857650118994914 Indiana Ave & 133rd St -87.617190 41.653800      1.1
     3 1984042930424753006 Steelworkers Park      -87.530910 41.737930      1.1
-    4 1448642188027369086 Indiana Ave & 133rd St -87.617054 41.653564      1.1
+    4 1448642188027369090 Steelworkers Park      -87.531067 41.738246      1.1
     5 1594046379513303720 Western Ave & Lake St  -87.685853 41.884606      1.1
-    6 1448642188027369090 Steelworkers Park      -87.531067 41.738246      1.1
+    6 1448642188027369086 Indiana Ave & 133rd St -87.617054 41.653564      1.1
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
