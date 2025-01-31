@@ -16,8 +16,9 @@ the service. In order to do this we will focus on the next questions:
   the service that could be helpful?
 - What suggestions could be made to the marketing team?
 
-With those goals setted, we can start our analisys of the data. \#
-Setting up packages
+With those goals setted, we can start our analisys of the data.
+
+# Setting up packages
 
 First, we will setup all the R packages that we will use.
 
@@ -235,8 +236,14 @@ colSums(is.na(df))
                      0 
 
 The other data that is missing is naming and id info from the stations.
-We can check if we can fill the missing data with other entries that
-have the same geographical information.
+Reading how the company operates, if you leave a divvy in any other
+place that is not a station, you will be charged a fee, we can consider
+this the cause for those missing entries. This will be used as another
+parameter in our analisys.
+
+Looking back to the data summary at the beginning, we can see that some
+coordinates are very far away from the range, lets have some deeper look
+at the stations info
 
 ``` r
 df |>
@@ -265,11 +272,23 @@ df |>
 
     [1] 1342701       3
 
-We can deduce that this dataset has multiple values for some stations.
-Altought this could be intented (to have precise data on where was the
-bycicle taken/returned), we are not interested in those especifics, we
-should also fix this. Looking at the page from divvy, we could obtain
-the exact location of the stations, let’s incorporate that
+We can deduce that this dataset has multiple coordinates for some
+stations. This may be due to how the coordinates and stations are added
+to the database, maybe the coordinates are given by the bycicle, and if
+the lock is activated in a station the name of the station is added to
+the formulary before it is uploaded.
+
+This might be a problem, since we detected that there are some
+coordinates that are very far away from the city where Divvy is working,
+and we may want to use the location of the stations to look for some
+trends. Let’s find the worst cases of this problematic.
+
+``` r
+#TODO
+```
+
+Looking at the page from divvy, we could obtain the exact location of
+the stations, let’s incorporate that
 
 ``` r
 stations_json <- "stations.json"
@@ -279,8 +298,7 @@ if (!file.exists(stations_json)) {
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, name, lon, lat) |>
-  mutate(distance = 1.1, lat=num(lat,digits=6), lon=num(lon, digits = 6))
+  select(station_id, short_name, name, lon, lat)
 
 stations |>
   distinct(station_id)|>
@@ -305,14 +323,14 @@ stations |>
 ```
 
     # A tibble: 6 x 5
-      station_id                           name               lon       lat distance
-      <chr>                                <chr>        <num:.6!> <num:.6!>    <dbl>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 "Wilton Av~ -87.652705 41.932418      1.1
-    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 "Wilton Av~ -87.652705 41.932418      1.1
-    3 1827484051430132402                  "Public Ra~ -87.755520 41.978710      1.1
-    4 1677249871073777806                  "Public Ra~ -87.662076 41.801354      1.1
-    5 1715823821144840768                  "Public Ra~ -87.662076 41.801354      1.1
-    6 1827474404723843690                  "Public Ra~ -87.755520 41.978710      1.1
+      station_id                           short_name   name               lon   lat
+      <chr>                                <chr>        <chr>            <dbl> <dbl>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 "Wilton Ave & D~ -87.7  41.9
+    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 chargingstx2 "Wilton Ave & D~ -87.7  41.9
+    3 1827484051430132402                  <NA>         "Public Rack - ~ -87.8  42.0
+    4 1677249871073777806                  <NA>         "Public Rack - ~ -87.7  41.8
+    5 1715823821144840768                  <NA>         "Public Rack - ~ -87.7  41.8
+    6 1827474404723843690                  <NA>         "Public Rack - ~ -87.8  42.0
 
 ``` r
 stations |>
@@ -322,14 +340,14 @@ stations |>
 ```
 
     # A tibble: 6 x 5
-      station_id          name                          lon       lat distance
-      <chr>               <chr>                   <num:.6!> <num:.6!>    <dbl>
-    1 1967727360320698512 Western Ave & Lake St  -87.686680 41.884810      1.1
-    2 1978857650118994914 Indiana Ave & 133rd St -87.617190 41.653800      1.1
-    3 1984042930424753006 Steelworkers Park      -87.530910 41.737930      1.1
-    4 1448642188027369090 Steelworkers Park      -87.531067 41.738246      1.1
-    5 1594046379513303720 Western Ave & Lake St  -87.685853 41.884606      1.1
-    6 1448642188027369086 Indiana Ave & 133rd St -87.617054 41.653564      1.1
+      station_id          short_name name                     lon   lat
+      <chr>               <chr>      <chr>                  <dbl> <dbl>
+    1 1967727360320698512 24211      Western Ave & Lake St  -87.7  41.9
+    2 1978857650118994914 24409      Indiana Ave & 133rd St -87.6  41.7
+    3 1984042930424753006 24394      Steelworkers Park      -87.5  41.7
+    4 1448642188027369090 <NA>       Steelworkers Park      -87.5  41.7
+    5 1594046379513303720 <NA>       Western Ave & Lake St  -87.7  41.9
+    6 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.6  41.7
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
@@ -350,9 +368,9 @@ stations |>
 ```
 
     # A tibble: 1 x 5
-      station_id                           name               lon       lat distance
-      <chr>                                <chr>        <num:.6!> <num:.6!>    <dbl>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 Wilton Ave~ -87.652705 41.932418      1.1
+      station_id                           short_name   name               lon   lat
+      <chr>                                <chr>        <chr>            <dbl> <dbl>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 Wilton Ave & Di~ -87.7  41.9
 
 Awesome, now we have a clean dataset of the stations info
 

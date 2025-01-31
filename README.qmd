@@ -104,8 +104,12 @@ recover the data lost, we sould drop those entries.
 df <- filter(df, !is.na(end_lng))
 colSums(is.na(df))
 ```
-The other data that is missing is naming and id info from the stations. We can check if we can fill
-the missing data with other entries that have the same geographical information.
+The other data that is missing is naming and id info from the stations. Reading how the company operates, if you leave a divvy
+in any other place that is not a station, you will be charged a fee, we can consider this the cause for those missing entries. This will be 
+used as another parameter in our analisys.
+
+Looking back to the data summary at the beginning, we can see that some coordinates are very far away from the range, lets have some deeper 
+look at the stations info
 ```{r}
 df |>
   select(start_station_id) |>
@@ -123,8 +127,18 @@ df |>
   dim()
 ```
 
-We can deduce that this dataset has multiple values for some stations. Altought this could be intented 
-(to have precise data on where was the bycicle taken/returned), we are not interested in those especifics, we should also fix this.
+We can deduce that this dataset has multiple coordinates for some stations. This may be due to how the coordinates and 
+stations are added to the database, maybe the coordinates are given by the bycicle, and if the lock is activated in a station
+the name of the station is added to the formulary before it is uploaded.
+
+This might be a problem, since we detected that there are some coordinates that are very far away from the city where Divvy
+is working, and we may want to use the location of the stations to look for some trends. Let's find the worst cases of this problematic.
+```{R} 
+#TODO
+```
+
+
+
 Looking at the page from divvy, we could obtain the exact location of the stations, let's incorporate that
 
 ```{r} 
@@ -135,8 +149,7 @@ if (!file.exists(stations_json)) {
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, name, lon, lat) |>
-  mutate(distance = 1.1, lat=num(lat,digits=6), lon=num(lon, digits = 6))
+  select(station_id, short_name, name, lon, lat)
 
 stations |>
   distinct(station_id)|>
