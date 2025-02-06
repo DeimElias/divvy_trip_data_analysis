@@ -25,6 +25,7 @@
               pandoc
               glibcLocales
               nix
+              quarto
             ];
             shellHook = "
               nu
