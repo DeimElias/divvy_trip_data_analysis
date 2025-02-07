@@ -75,7 +75,7 @@ sustent this hipothesys
 ```{r} 
 global_theme <-  function() {
   theme_linedraw() +
-  theme(axis.text.y = element_blank(),
+  theme(axis.text.y = element_text(colour = 'white', face = 'bold'),
     axis.text.x = element_text(colour = 'white', face = 'bold'),
     axis.title.y = element_text(colour ='white', face = 'bold'), 
     axis.title.x = element_text(colour ='white', face = 'bold'),
@@ -132,9 +132,22 @@ stations are added to the database, maybe the coordinates are given by the bycic
 the name of the station is added to the formulary before it is uploaded.
 
 This might be a problem, since we detected that there are some coordinates that are very far away from the city where Divvy
-is working, and we may want to use the location of the stations to look for some trends. Let's find the worst cases of this problematic.
+is working, and we may want to use the location of the stations to look for some trends. Let's find an example of this problematic.
 ```{R} 
-#TODO
+distm_v <- Vectorize(function(x1, y1, x2, y2) {
+  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
+})
+
+df |>
+  select( start_station_id, start_station_name, start_lng, start_lat ) |>
+  filter(start_station_id == 13029)|>
+  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant = distm_v(mean_lat, mean_lng, start_lat, start_lng) )|>
+  filter(most_distant > 15)|>
+  ggplot() + aes(x=most_distant) + scale_x_log10() + global_theme() +
+  geom_histogram(bins=100, color = "#07D0FF", fill = "#06CEFD") +
+  labs(x = "Distance (in meters) to station (calculated by mean)", y = "Number of rides started at given distance", title = "Distribution of start of ride distance to station (calulated by mean)", subtitle = "Station Flied Museum
+    (only rides that start at distance greater than 15m")
+
 ```
 
 
