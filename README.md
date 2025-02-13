@@ -216,10 +216,12 @@ df |>
   geom_histogram(binwidth = 1, color = "#000000", fill = "#06CEFD") +
   global_theme() +
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
-  labs(x = "Day of month", 
+  labs(
+    x = "Day of month", 
     y = "Number of rides", 
     title = "Nunber of rides with missing geografical location", 
-    subtitle = "by day of month")
+    subtitle = "by day of month"
+  )
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
@@ -315,8 +317,12 @@ df |>
 
 ![](README_files/figure-commonmark/unnamed-chunk-7-1.png)
 
-Looking at the page from divvy, we could obtain the exact location of
-the stations, let’s incorporate that
+This graph shows that the coordinates present in our data are
+unreliable. Thus we need to look for another data source for information
+about coordinates of stations.
+
+Looking at the data page from divvy, there is a link for a json with
+information about location of the stations, let’s incorporate that.
 
 ``` r
 stations_json <- "stations.json"
@@ -326,7 +332,8 @@ if (!file.exists(stations_json)) {
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, short_name, name, lon, lat)
+  select(station_id, short_name, name, lon, lat) |>
+  mutate(lon = num(lon, digits=6), lat = num(lat, digits=6))
 
 stations |>
   distinct(station_id) |>
@@ -351,14 +358,14 @@ stations |>
 ```
 
     # A tibble: 6 x 5
-      station_id                           short_name   name               lon   lat
-      <chr>                                <chr>        <chr>            <dbl> <dbl>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 "Wilton Ave & D~ -87.7  41.9
-    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 chargingstx2 "Wilton Ave & D~ -87.7  41.9
-    3 1827484051430132402                  <NA>         "Public Rack - ~ -87.8  42.0
-    4 1715823821144840768                  <NA>         "Public Rack - ~ -87.7  41.8
-    5 1677249871073777806                  <NA>         "Public Rack - ~ -87.7  41.8
-    6 1827474404723843690                  <NA>         "Public Rack - ~ -87.8  42.0
+      station_id                           short_name   name           lon       lat
+      <chr>                                <chr>        <chr>    <num:.6!> <num:.6!>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 "Wilto~ -87.652705 41.932418
+    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 chargingstx2 "Wilto~ -87.652705 41.932418
+    3 1827484051430132402                  <NA>         "Publi~ -87.755520 41.978710
+    4 1715823821144840768                  <NA>         "Publi~ -87.662076 41.801354
+    5 1677249871073777806                  <NA>         "Publi~ -87.662076 41.801354
+    6 1827474404723843690                  <NA>         "Publi~ -87.755520 41.978710
 
 ``` r
 stations |>
@@ -368,14 +375,14 @@ stations |>
 ```
 
     # A tibble: 6 x 5
-      station_id          short_name name                     lon   lat
-      <chr>               <chr>      <chr>                  <dbl> <dbl>
-    1 1978857650118994914 24409      Indiana Ave & 133rd St -87.6  41.7
-    2 1967727360320698512 24211      Western Ave & Lake St  -87.7  41.9
-    3 1984042930424753006 24394      Steelworkers Park      -87.5  41.7
-    4 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.6  41.7
-    5 1594046379513303720 <NA>       Western Ave & Lake St  -87.7  41.9
-    6 1448642188027369090 <NA>       Steelworkers Park      -87.5  41.7
+      station_id          short_name name                          lon       lat
+      <chr>               <chr>      <chr>                   <num:.6!> <num:.6!>
+    1 1978857650118994914 24409      Indiana Ave & 133rd St -87.617190 41.653800
+    2 1967727360320698512 24211      Western Ave & Lake St  -87.686680 41.884810
+    3 1984042930424753006 24394      Steelworkers Park      -87.530910 41.737930
+    4 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.617054 41.653564
+    5 1594046379513303720 <NA>       Western Ave & Lake St  -87.685853 41.884606
+    6 1448642188027369090 <NA>       Steelworkers Park      -87.531067 41.738246
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
@@ -387,6 +394,11 @@ them on Google Maps. Here are my findings:
   meter or 2 of distance, we can consider both as one station
 - Laflin St & 51st St appears to be a typo, since there is just one
   station nerby.
+- For those stations that share name but not coordinates, I’ve found
+  that they are just stations that are very close to each other. Luckly,
+  they have a different station id, and more over, only 1 of each pair
+  have shortname, which is the coulumn used as station id in our
+  dataframe.
 
 We will proceed as follows
 
@@ -396,9 +408,9 @@ stations |>
 ```
 
     # A tibble: 1 x 5
-      station_id                           short_name   name               lon   lat
-      <chr>                                <chr>        <chr>            <dbl> <dbl>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 Wilton Ave & Di~ -87.7  41.9
+      station_id                           short_name   name           lon       lat
+      <chr>                                <chr>        <chr>    <num:.6!> <num:.6!>
+    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 Wilton~ -87.652705 41.932418
 
 Awesome, now we have a clean dataset of the stations info
 

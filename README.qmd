@@ -98,10 +98,12 @@ df |>
   geom_histogram(binwidth = 1, color = "#000000", fill = "#06CEFD") +
   global_theme() +
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
-  labs(x = "Day of month", 
+  labs(
+    x = "Day of month", 
     y = "Number of rides", 
     title = "Nunber of rides with missing geografical location", 
-    subtitle = "by day of month")
+    subtitle = "by day of month"
+  )
 ```
 We can't see anything that suggest anything conclusive. Since we can't confidently
 recover the data lost, we sould drop those entries.
@@ -162,10 +164,12 @@ df |>
     caption = "(only rides with distance > 15m)"
   )
 ```
+This graph shows that the coordinates present in our data are unreliable. Thus we need to look for another data source for
+information about coordinates of stations.
 
 
-
-Looking at the page from divvy, we could obtain the exact location of the stations, let's incorporate that
+Looking at the data page from divvy, there is a link for a json with information about location of the stations, let's incorporate
+that.
 
 ```{r} 
 stations_json <- "stations.json"
@@ -175,7 +179,8 @@ if (!file.exists(stations_json)) {
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
-  select(station_id, short_name, name, lon, lat)
+  select(station_id, short_name, name, lon, lat) |>
+  mutate(lon = num(lon, digits=6), lat = num(lat, digits=6))
 
 stations |>
   distinct(station_id) |>
@@ -201,6 +206,10 @@ with one hand, I manually check them on Google Maps. Here are my findings:
   - Wilton Ave & Diversey Pkwy has many places to park, maybe the company takes those as 2 different stations
   - Forest Glen station and Peterson Park are 2 stations that are just a meter or 2 of distance, we can consider both as one station
   - Laflin St & 51st St appears to be a typo, since there is just one station nerby.
+  - For those stations that share name but not coordinates, I've found that they are just stations that are very close to each other.
+    Luckly, they have a different station id, and more over, only 1 of each pair have shortname, which is the coulumn used as station id in our
+    dataframe.
+
 
 We will proceed as follows
 ```{r}
