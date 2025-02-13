@@ -191,29 +191,35 @@ dataset publishing as the main source of missing information. Let’s
 check a graph that could sustent this hipothesys
 
 ``` r
-global_theme <-  function() {
+global_theme <- function() {
   theme_linedraw() +
-  theme(axis.text.y = element_blank(),
-    axis.text.x = element_text(colour = 'white', face = 'bold'),
-    axis.title.y = element_text(colour ='white', face = 'bold'), 
-    axis.title.x = element_text(colour ='white', face = 'bold'),
-    plot.title = element_text(colour = 'white', face = 'bold'),
-    plot.subtitle = element_text(colour = 'white', face = 'bold'),
-    strip.background = element_rect(fill = "#262852", color='#262852'),
-    strip.placement = "inside",
-    strip.text = element_text(colour = "white", face = 'bold'), 
-    panel.background = element_rect(fill = "#262852"), 
-    plot.background = element_rect(fill = "#150F3A"))
+    theme(
+      axis.text.y = element_text(colour = "white", face = "bold"),
+      axis.text.x = element_text(colour = "white", face = "bold"),
+      axis.title.y = element_text(colour = "white", face = "bold"),
+      axis.title.x = element_text(colour = "white", face = "bold"),
+      plot.title = element_text(colour = "white", face = "bold"),
+      plot.subtitle = element_text(colour = "white", face = "bold"),
+      strip.background = element_rect(fill = "#262852", color = "#262852"),
+      strip.placement = "inside",
+      strip.text = element_text(colour = "white", face = "bold"),
+      panel.background = element_rect(fill = "#262852"),
+      plot.background = element_rect(fill = "#150F3A"),
+      plot.caption = element_text(colour = "white", face = "bold")
+    )
 }
 
 df |>
   filter(is.na(end_lng)) |>
   ggplot() +
   aes(x = mday(started_at)) +
-  geom_histogram(bins = 31, color = "#07D0FF", fill = "#06CEFD") +
+  geom_histogram(binwidth = 1, color = "#000000", fill = "#06CEFD") +
   global_theme() +
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
-  labs(x = "Day of month", y = "Number of rides", title = "Nunber of rides with missing geografical location", subtitle = "by day of month")
+  labs(x = "Day of month", 
+    y = "Number of rides", 
+    title = "Nunber of rides with missing geografical location", 
+    subtitle = "by day of month")
 ```
 
 ![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
@@ -281,11 +287,33 @@ the formulary before it is uploaded.
 This might be a problem, since we detected that there are some
 coordinates that are very far away from the city where Divvy is working,
 and we may want to use the location of the stations to look for some
-trends. Let’s find the worst cases of this problematic.
+trends. Let’s find an example of this problematic.
 
 ``` r
-#TODO
+distm_v <- Vectorize(function(x1, y1, x2, y2) {
+  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
+})
+
+df |>
+  select(start_station_id, start_station_name, start_lng, start_lat) |>
+  filter(start_station_id == 13029) |>
+  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant = distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
+  filter(most_distant > 15) |>
+  ggplot() +
+  aes(x = most_distant) +
+  scale_x_log10() +
+  global_theme() +
+  geom_histogram(bins = 100, color = "#000000", fill = "#06CEFD") +
+  labs(
+    x = "Distance (meters) to mean",
+    y = "Number of rides",
+    title = "Distribution of distance to mean of start coordinates",
+    subtitle = 'Station "Station Flied Museum"',
+    caption = "(only rides with distance > 15m)"
+  )
 ```
+
+![](README_files/figure-commonmark/unnamed-chunk-7-1.png)
 
 Looking at the page from divvy, we could obtain the exact location of
 the stations, let’s incorporate that
@@ -301,7 +329,7 @@ stations <- fromJSON(stations_json) |>
   select(station_id, short_name, name, lon, lat)
 
 stations |>
-  distinct(station_id)|>
+  distinct(station_id) |>
   dim()
 ```
 
@@ -319,7 +347,7 @@ stations |>
 stations |>
   group_by(lat, lon) |>
   filter(n() > 1) |>
-  ungroup() 
+  ungroup()
 ```
 
     # A tibble: 6 x 5
@@ -328,8 +356,8 @@ stations |>
     1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 "Wilton Ave & D~ -87.7  41.9
     2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 chargingstx2 "Wilton Ave & D~ -87.7  41.9
     3 1827484051430132402                  <NA>         "Public Rack - ~ -87.8  42.0
-    4 1677249871073777806                  <NA>         "Public Rack - ~ -87.7  41.8
-    5 1715823821144840768                  <NA>         "Public Rack - ~ -87.7  41.8
+    4 1715823821144840768                  <NA>         "Public Rack - ~ -87.7  41.8
+    5 1677249871073777806                  <NA>         "Public Rack - ~ -87.7  41.8
     6 1827474404723843690                  <NA>         "Public Rack - ~ -87.8  42.0
 
 ``` r
@@ -342,12 +370,12 @@ stations |>
     # A tibble: 6 x 5
       station_id          short_name name                     lon   lat
       <chr>               <chr>      <chr>                  <dbl> <dbl>
-    1 1967727360320698512 24211      Western Ave & Lake St  -87.7  41.9
-    2 1978857650118994914 24409      Indiana Ave & 133rd St -87.6  41.7
+    1 1978857650118994914 24409      Indiana Ave & 133rd St -87.6  41.7
+    2 1967727360320698512 24211      Western Ave & Lake St  -87.7  41.9
     3 1984042930424753006 24394      Steelworkers Park      -87.5  41.7
-    4 1448642188027369090 <NA>       Steelworkers Park      -87.5  41.7
+    4 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.6  41.7
     5 1594046379513303720 <NA>       Western Ave & Lake St  -87.7  41.9
-    6 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.6  41.7
+    6 1448642188027369090 <NA>       Steelworkers Park      -87.5  41.7
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
@@ -364,7 +392,7 @@ We will proceed as follows
 
 ``` r
 stations |>
-  filter(station_id=='a3a3a282-a135-11e9-9cda-0a87ae2ba916' | station_id=='')
+  filter(station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == "")
 ```
 
     # A tibble: 1 x 5
