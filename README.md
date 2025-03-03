@@ -4,10 +4,10 @@
 # Introduction
 
 In this case study we take a look at the dataset provided by Divvy, a
-company that is in the bussiness of bycicle rent. We will try to find
-useful insights about diiferences between members and casual users of
+company that is in the business of bicycle rent. We will try to find
+useful insights about differences between members and casual users of
 the service that the marketing team could use find useful to develop
-better marketing campaings to persuade casual user to become members of
+better marketing campaigns to persuade casual user to become members of
 the service. In order to do this we will focus on the next questions:
 
 - What are the problems the dataset presents? Is there any way to
@@ -16,7 +16,7 @@ the service. In order to do this we will focus on the next questions:
   the service that could be helpful?
 - What suggestions could be made to the marketing team?
 
-With those goals setted, we can start our analisys of the data.
+With those goals settled, we can start our analysis of the data.
 
 # Setting up packages
 
@@ -179,16 +179,16 @@ colSums(is.na(df))
 
 # Data cleaning
 
-The dataset has colums with 18% of their content missing. Since those
-colums are the name or the id of the stations, we can try to obtain that
-information from other sources. Also, there are some rows that does not
-have their geografical info on where the ride ended, let’s have a look
-at those.
+The dataset has columns with 18% of their content missing. Since those
+columns are the name or the id of the stations, we can try to obtain
+that information from other sources. Also, there are some rows that does
+not have their geographical info on where the ride ended, let’s have a
+look at those.
 
 One may suspect that the rides that have missing end latitude and
 longitude would be at the end of the month, thinking of this cut on the
 dataset publishing as the main source of missing information. Let’s
-check a graph that could sustent this hipothesys
+check a graph that could sustain this hypothesis
 
 ``` r
 global_theme <- function() {
@@ -217,9 +217,9 @@ df |>
   global_theme() +
   facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) +
   labs(
-    x = "Day of month", 
-    y = "Number of rides", 
-    title = "Nunber of rides with missing geografical location", 
+    x = "Day of month",
+    y = "Number of rides",
+    title = "Nunber of rides with missing geografical location",
     subtitle = "by day of month"
   )
 ```
@@ -227,7 +227,7 @@ df |>
 ![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
 
 We can’t see anything that suggest anything conclusive. Since we can’t
-confidently recover the data lost, we sould drop those entries.
+confidently recover the data lost, we should drop those entries.
 
 ``` r
 df <- filter(df, !is.na(end_lng))
@@ -247,11 +247,11 @@ The other data that is missing is naming and id info from the stations.
 Reading how the company operates, if you leave a divvy in any other
 place that is not a station, you will be charged a fee, we can consider
 this the cause for those missing entries. This will be used as another
-parameter in our analisys.
+parameter in our analysis.
 
 Looking back to the data summary at the beginning, we can see that some
-coordinates are very far away from the range, lets have some deeper look
-at the stations info
+coordinates are very far away from the range, let’s have some deeper
+look at the stations info
 
 ``` r
 df |>
@@ -281,15 +281,14 @@ df |>
     [1] 1342701       3
 
 We can deduce that this dataset has multiple coordinates for some
-stations. This may be due to how the coordinates and stations are added
-to the database, maybe the coordinates are given by the bycicle, and if
-the lock is activated in a station the name of the station is added to
-the formulary before it is uploaded.
-
-This might be a problem, since we detected that there are some
-coordinates that are very far away from the city where Divvy is working,
-and we may want to use the location of the stations to look for some
-trends. Let’s find an example of this problematic.
+stations. This might be due to how the coordinates and stations are
+added to the database. I think that the coordinates are given by the
+bicycle, and if the lock is activated in a station the name of the
+station is added to the form before it is uploaded. This might be a
+problem, since we detected that there are some coordinates that are very
+far away from the city where Divvy is working. We may want to use the
+location of the stations to look for some trends. Let’s find an example
+of this problematic.
 
 ``` r
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
@@ -327,13 +326,16 @@ information about location of the stations, let’s incorporate that.
 ``` r
 stations_json <- "stations.json"
 if (!file.exists(stations_json)) {
-  download.file("https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json", stations_json)
+  download.file(
+    "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json",
+    stations_json
+  )
 }
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
   select(station_id, short_name, name, lon, lat) |>
-  mutate(lon = num(lon, digits=6), lat = num(lat, digits=6))
+  mutate(lon = num(lon, digits = 6), lat = num(lat, digits = 6))
 
 stations |>
   distinct(station_id) |>
@@ -393,18 +395,20 @@ them on Google Maps. Here are my findings:
 - Forest Glen station and Peterson Park are 2 stations that are just a
   meter or 2 of distance, we can consider both as one station
 - Laflin St & 51st St appears to be a typo, since there is just one
-  station nerby.
+  station nearby.
 - For those stations that share name but not coordinates, I’ve found
-  that they are just stations that are very close to each other. Luckly,
-  they have a different station id, and more over, only 1 of each pair
-  have shortname, which is the coulumn used as station id in our
-  dataframe.
+  that they are just stations that are very close to each other.
+  Luckily, they have a different station id, and more over, only 1 of
+  each pair have shortname, which is the column used as station id in
+  our original dataframe.
 
-We will proceed as follows
+Given those observations,
 
 ``` r
 stations |>
-  filter(station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == "")
+  filter(
+    station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == ""
+  )
 ```
 
     # A tibble: 1 x 5
@@ -419,7 +423,7 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })
 
-assert.value <- function(value) {
+assert_value <- function(value) {
   if (dim(value)[1] == 0) {
     tibble(station_id = "")
   } else {
@@ -427,34 +431,41 @@ assert.value <- function(value) {
   }
 }
 
-closestStationMargin <- function(margin) {
+closest_station_margin <- function(margin) {
   function(latitude, longitude) {
-    station.closest <- stations |>
-      select(lat, lon, station_id, distance) |>
-      filter(lat < latitude + margin & lat > latitude - margin & lon < longitude + margin & lon > longitude - margin) |>
+    station_closest <- stations |>
+      select(lat, lon, station_id) |>
+      filter(
+        lat < latitude + margin &
+          lat > latitude - margin &
+          lon < longitude + margin &
+          lon > longitude - margin
+      ) |>
       mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
       slice_min(distance, n = 1, with_ties = FALSE) |>
-      assert.value() |>
+      assert_value() |>
       _$station_id
   }
 }
 
-stations.geoinfo <- select(df, start_lat, start_lng) |>
+stations_geoinfo <- select(df, start_lat, start_lng) |>
   rename(lat = start_lat, lng = start_lng) |>
   bind_rows(select(df, end_lat, end_lng) |>
     rename(lat = end_lat, lng = end_lng)) |>
   unique()
 
-stationsGetClosest <- closestStationMargin(0.001)
+stations_get_closest <- closest_station_margin(0.001)
 
 plan(multicore, workers = 3)
-stations.with.id <- if (file.exists("coords_with_names.csv")) {
+stations_with_id <- if (file.exists("coords_with_names.csv")) {
   read_csv("coords_with_names.csv")
 } else {
   stations.geoinfo |>
     rename(latitude = lat, longitude = lng) |>
     slice_sample(n = 50000) |>
-    mutate(station_id = future_map2_chr(latitude, longitude, stationsGetClosest))
+    mutate(
+      station_id = future_map2_chr(latitude, longitude, stations_get_closest)
+    )
 }
 ```
 

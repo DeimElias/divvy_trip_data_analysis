@@ -13,7 +13,7 @@
     {
       overlays.default = final: prev: rec {
         rEnv = final.rWrapper.override {
-          packages = with final.rPackages; [ knitr tidyverse sf mapview jsonlite geosphere furrr styler quarto];
+          packages = with final.rPackages; [ knitr tidyverse sf mapview jsonlite geosphere furrr styler quarto languageserver];
         };
       };
 

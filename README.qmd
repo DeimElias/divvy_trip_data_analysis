@@ -25,7 +25,6 @@ With those goals settled, we can start our analysis of the data.
 First, we will setup all the R packages that we will use.
 
 ```{r}
-
 library(tidyverse)
 library(mapview)
 library(lubridate)
@@ -33,13 +32,11 @@ library(sf)
 library(jsonlite)
 library(geosphere)
 library(furrr)
-
 ```
 
 Loading data from source, if not it is available locally.
 
 ```{r}
-
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
 df <- tibble()
 for (date in dates) {
@@ -50,14 +47,12 @@ for (date in dates) {
   }
   df <- df |> bind_rows(read_csv(file, show_col_types = FALSE))
 }
-
 ```
 
 # Exploratory face
 Read file as a tibble and first look at data.
 
 ```{r}
-
 head(df)
 
 summary(df)
@@ -70,7 +65,6 @@ df |>
   dim()
 
 colSums(is.na(df))
-
 ```
 
 # Data cleaning
@@ -88,20 +82,20 @@ could sustain this hypothesis
 ```{r} 
 global_theme <- function() {
   theme_linedraw() +
-  theme(
-    axis.text.y = element_text(colour = "white", face = "bold"),
-    axis.text.x = element_text(colour = "white", face = "bold"),
-    axis.title.y = element_text(colour = "white", face = "bold"),
-    axis.title.x = element_text(colour = "white", face = "bold"),
-    plot.title = element_text(colour = "white", face = "bold"),
-    plot.subtitle = element_text(colour = "white", face = "bold"),
-    strip.background = element_rect(fill = "#262852", color = "#262852"),
-    strip.placement = "inside",
-    strip.text = element_text(colour = "white", face = "bold"),
-    panel.background = element_rect(fill = "#262852"),
-    plot.background = element_rect(fill = "#150F3A"),
-    plot.caption = element_text(colour = "white", face = "bold")
-  )
+    theme(
+      axis.text.y = element_text(colour = "white", face = "bold"),
+      axis.text.x = element_text(colour = "white", face = "bold"),
+      axis.title.y = element_text(colour = "white", face = "bold"),
+      axis.title.x = element_text(colour = "white", face = "bold"),
+      plot.title = element_text(colour = "white", face = "bold"),
+      plot.subtitle = element_text(colour = "white", face = "bold"),
+      strip.background = element_rect(fill = "#262852", color = "#262852"),
+      strip.placement = "inside",
+      strip.text = element_text(colour = "white", face = "bold"),
+      panel.background = element_rect(fill = "#262852"),
+      plot.background = element_rect(fill = "#150F3A"),
+      plot.caption = element_text(colour = "white", face = "bold")
+    )
 }
 
 df |>
@@ -117,17 +111,14 @@ df |>
     title = "Nunber of rides with missing geografical location",
     subtitle = "by day of month"
   )
-
 ```
 
 We can't see anything that suggest anything conclusive. Since we can't
 confidently recover the data lost, we should drop those entries.
 
 ```{r}
-
 df <- filter(df, !is.na(end_lng))
 colSums(is.na(df))
-
 ```
 
 The other data that is missing is naming and id info from the stations. Reading
@@ -140,7 +131,6 @@ coordinates are very far away from the range, let's have some deeper look at
 the stations info
 
 ```{r}
-
 df |>
   select(start_station_id) |>
   unique() |>
@@ -155,7 +145,6 @@ df |>
   select(start_station_id, start_lat, start_lng) |>
   unique() |>
   dim()
-
 ```
 
 We can deduce that this dataset has multiple coordinates for some stations.
@@ -168,7 +157,6 @@ working. We may want to use the location of the stations to look for some
 trends. Let's find an example of this problematic.
 
 ```{R} 
-
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })
@@ -176,7 +164,8 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 df |>
   select(start_station_id, start_station_name, start_lng, start_lat) |>
   filter(start_station_id == 13029) |>
-  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant = distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
+  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
+    distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
   filter(most_distant > 15) |>
   ggplot() +
   aes(x = most_distant) +
@@ -190,7 +179,6 @@ df |>
     subtitle = 'Station "Station Flied Museum"',
     caption = "(only rides with distance > 15m)"
   )
-
 ```
 
 This graph shows that the coordinates present in our data are unreliable. Thus
@@ -202,12 +190,12 @@ Looking at the data page from divvy, there is a link for a json with
 information about location of the stations, let's incorporate that.
 
 ```{r} 
-
 stations_json <- "stations.json"
 if (!file.exists(stations_json)) {
   download.file(
     "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json",
-    stations_json)
+    stations_json
+  )
 }
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
@@ -232,7 +220,6 @@ stations |>
   group_by(name) |>
   filter(n() > 1) |>
   ungroup()
-
 ```
 
 This data is mostly clean, just some typos in the system that are an easy fix.
@@ -253,17 +240,15 @@ Maps. Here are my findings:
 Given those observations, 
 
 ```{r}
-
 stations |>
   filter(
-    station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == "")
-
+    station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == ""
+  )
 ```
 
 Awesome, now we have a clean dataset of the stations info
 
 ```{r}
-
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })
@@ -278,13 +263,13 @@ assert_value <- function(value) {
 
 closest_station_margin <- function(margin) {
   function(latitude, longitude) {
-    station.closest <- stations |>
+    station_closest <- stations |>
       select(lat, lon, station_id) |>
       filter(
         lat < latitude + margin &
-        lat > latitude - margin &
-        lon < longitude + margin &
-        lon > longitude - margin
+          lat > latitude - margin &
+          lon < longitude + margin &
+          lon > longitude - margin
       ) |>
       mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
       slice_min(distance, n = 1, with_ties = FALSE) |>
@@ -296,10 +281,10 @@ closest_station_margin <- function(margin) {
 stations_geoinfo <- select(df, start_lat, start_lng) |>
   rename(lat = start_lat, lng = start_lng) |>
   bind_rows(select(df, end_lat, end_lng) |>
-  rename(lat = end_lat, lng = end_lng)) |>
+    rename(lat = end_lat, lng = end_lng)) |>
   unique()
 
-stations_get_closest <- closestStationMargin(0.001)
+stations_get_closest <- closest_station_margin(0.001)
 
 plan(multicore, workers = 3)
 stations_with_id <- if (file.exists("coords_with_names.csv")) {
@@ -309,10 +294,9 @@ stations_with_id <- if (file.exists("coords_with_names.csv")) {
     rename(latitude = lat, longitude = lng) |>
     slice_sample(n = 50000) |>
     mutate(
-      station_id = future_map2_chr(latitude, longitude, stationsGetClosest)
+      station_id = future_map2_chr(latitude, longitude, stations_get_closest)
     )
 }
-
 ```
 
 # Data cleaning
