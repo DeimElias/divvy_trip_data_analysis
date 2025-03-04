@@ -1,3 +1,4 @@
 *.json
 *.zip
 .R*
+README_cache

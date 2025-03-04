@@ -1,6 +1,10 @@
 ---
 title: Divvy case study
 format: gfm
+execute:
+  cache: true
+  echo: true
+  warning : false
 ---
 
 # Introduction
@@ -25,7 +29,11 @@ With those goals settled, we can start our analysis of the data.
 First, we will setup all the R packages that we will use.
 
 ```{r}
+#| output: false
+#| label: "Loading libraries"
+
 library(tidyverse)
+library(knitr)
 library(mapview)
 library(lubridate)
 library(sf)
@@ -37,6 +45,8 @@ library(furrr)
 Loading data from source, if not it is available locally.
 
 ```{r}
+#| output: false
+#| label: "Reading trips data"
 dates <- list("202310", "202311", "202312", "202401", "202402", "202403", "202404", "202405", "202406", "202407", "202408", "202409")
 df <- tibble()
 for (date in dates) {
@@ -53,9 +63,9 @@ for (date in dates) {
 Read file as a tibble and first look at data.
 
 ```{r}
-head(df)
+kable(head(df))
 
-summary(df)
+kable(summary(df))
 
 dim(df)
 
@@ -64,7 +74,7 @@ df |>
   unique() |>
   dim()
 
-colSums(is.na(df))
+kable(colSums(is.na(df)))
 ```
 
 # Data cleaning
@@ -80,6 +90,8 @@ publishing as the main source of missing information. Let's check a graph that
 could sustain this hypothesis
 
 ```{r} 
+#| label: "setting global theme"
+#| echo: false
 global_theme <- function() {
   theme_linedraw() +
     theme(
@@ -97,7 +109,11 @@ global_theme <- function() {
       plot.caption = element_text(colour = "white", face = "bold")
     )
 }
+```
 
+```{r}
+#| label: "Graph of rides with missing end location info"
+#| fig-cap: "We expected almost all rides of this kind to be at the end of the month to prove our hypothesis"
 df |>
   filter(is.na(end_lng)) |>
   ggplot() +
@@ -214,30 +230,32 @@ stations |>
 stations |>
   group_by(lat, lon) |>
   filter(n() > 1) |>
-  ungroup()
+  ungroup()|>
+  kable()
 
 stations |>
   group_by(name) |>
   filter(n() > 1) |>
-  ungroup()
+  ungroup() |>
+  kable()
 ```
 
 This data is mostly clean, just some typos in the system that are an easy fix.
 Since I can count those errors with one hand, I manually check them on Google
 Maps. Here are my findings:
 
-  - Wilton Ave & Diversey Pkwy has many places to park, maybe the company takes
+  1) Wilton Ave & Diversey Pkwy has many places to park, maybe the company takes
   those as 2 different stations
-  - Forest Glen station and Peterson Park are 2 stations that are just a meter
+  2) Forest Glen station and Peterson Park are 2 stations that are just a meter
   or 2 of distance, we can consider both as one station
-  - Laflin St & 51st St appears to be a typo, since there is just one station
+  3) Laflin St & 51st St appears to be a typo, since there is just one station
   nearby.
-  - For those stations that share name but not coordinates, I've found that
+  4) For those stations that share name but not coordinates, I've found that
   they are just stations that are very close to each other. Luckily, they have
   a different station id, and more over, only 1 of each pair have shortname,
   which is the column used as station id in our original dataframe.
 
-Given those observations, 
+Given those observations, we can merge 
 
 ```{r}
 stations |>

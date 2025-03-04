@@ -24,44 +24,14 @@ First, we will setup all the R packages that we will use.
 
 ``` r
 library(tidyverse)
-```
-
-    -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
-    v dplyr     1.1.4     v readr     2.1.5
-    v forcats   1.0.0     v stringr   1.5.1
-    v ggplot2   3.5.1     v tibble    3.2.1
-    v lubridate 1.9.3     v tidyr     1.3.1
-    v purrr     1.0.2     
-    -- Conflicts ------------------------------------------ tidyverse_conflicts() --
-    x dplyr::filter() masks stats::filter()
-    x dplyr::lag()    masks stats::lag()
-    i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
+library(knitr)
 library(mapview)
 library(lubridate)
 library(sf)
-```
-
-    Linking to GEOS 3.13.0, GDAL 3.9.3, PROJ 9.5.0; sf_use_s2() is TRUE
-
-``` r
 library(jsonlite)
-```
-
-
-    Attaching package: 'jsonlite'
-
-    The following object is masked from 'package:purrr':
-
-        flatten
-
-``` r
 library(geosphere)
 library(furrr)
 ```
-
-    Loading required package: future
 
 Loading data from source, if not it is available locally.
 
@@ -78,76 +48,36 @@ for (date in dates) {
 }
 ```
 
-    Multiple files in zip: reading '202310-divvy-tripdata.csv'
-    Multiple files in zip: reading '202311-divvy-tripdata.csv'
-    Multiple files in zip: reading '202312-divvy-tripdata.csv'
-    Multiple files in zip: reading '202401-divvy-tripdata.csv'
-    Multiple files in zip: reading '202402-divvy-tripdata.csv'
-    Multiple files in zip: reading '202403-divvy-tripdata.csv'
-    Multiple files in zip: reading '202404-divvy-tripdata.csv'
-    Multiple files in zip: reading '202405-divvy-tripdata.csv'
-    Multiple files in zip: reading '202406-divvy-tripdata.csv'
-    Multiple files in zip: reading '202407-divvy-tripdata.csv'
-    Multiple files in zip: reading '202408-divvy-tripdata.csv'
-    Multiple files in zip: reading '202409-divvy-tripdata.csv'
-
 # Exploratory face
 
 Read file as a tibble and first look at data.
 
 ``` r
-head(df)
+kable(head(df))
 ```
 
-    # A tibble: 6 x 13
-      ride_id          rideable_type started_at          ended_at           
-      <chr>            <chr>         <dttm>              <dttm>             
-    1 4449097279F8BBE7 classic_bike  2023-10-08 10:36:26 2023-10-08 10:49:19
-    2 9CF060543CA7B439 electric_bike 2023-10-11 17:23:59 2023-10-11 17:36:08
-    3 667F21F4D6BDE69C electric_bike 2023-10-12 07:02:33 2023-10-12 07:06:53
-    4 F92714CC6B019B96 classic_bike  2023-10-24 19:13:03 2023-10-24 19:18:29
-    5 5E34BA5DE945A9CC classic_bike  2023-10-09 18:19:26 2023-10-09 18:30:56
-    6 F7D7420AFAC53CD9 electric_bike 2023-10-04 17:10:59 2023-10-04 17:25:21
-    # i 9 more variables: start_station_name <chr>, start_station_id <chr>,
-    #   end_station_name <chr>, end_station_id <chr>, start_lat <dbl>,
-    #   start_lng <dbl>, end_lat <dbl>, end_lng <dbl>, member_casual <chr>
+| ride_id          | rideable_type | started_at          | ended_at            | start_station_name                   | start_station_id | end_station_name            | end_station_id | start_lat | start_lng |  end_lat |   end_lng | member_casual |
+|:-----------------|:--------------|:--------------------|:--------------------|:-------------------------------------|:-----------------|:----------------------------|:---------------|----------:|----------:|---------:|----------:|:--------------|
+| 4449097279F8BBE7 | classic_bike  | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | 620              | Sheffield Ave & Webster Ave | TA1309000033   |  41.89820 | -87.63754 | 41.92154 | -87.65382 | member        |
+| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St            | TA1306000003     | Sheffield Ave & Webster Ave | TA1309000033   |  41.88864 | -87.64441 | 41.92154 | -87.65382 | member        |
+| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | 620              | Franklin St & Lake St       | TA1307000111   |  41.89807 | -87.63751 | 41.88584 | -87.63550 | member        |
+| F92714CC6B019B96 | classic_bike  | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St            | TA1306000003     | Franklin St & Lake St       | TA1307000111   |  41.88872 | -87.64445 | 41.88584 | -87.63550 | member        |
+| 5E34BA5DE945A9CC | classic_bike  | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St            | TA1306000003     | Franklin St & Lake St       | TA1307000111   |  41.88872 | -87.64445 | 41.88584 | -87.63550 | member        |
+| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | 620              | Sheffield Ave & Webster Ave | TA1309000033   |  41.89812 | -87.63753 | 41.92154 | -87.65382 | member        |
 
 ``` r
-summary(df)
+kable(summary(df))
 ```
 
-       ride_id          rideable_type        started_at                    
-     Length:5854544     Length:5854544     Min.   :2023-10-01 00:00:05.00  
-     Class :character   Class :character   1st Qu.:2024-02-27 05:34:06.75  
-     Mode  :character   Mode  :character   Median :2024-06-06 12:55:34.65  
-                                           Mean   :2024-05-08 12:56:33.76  
-                                           3rd Qu.:2024-08-05 11:12:35.00  
-                                           Max.   :2024-09-30 23:54:05.54  
-                                                                           
-        ended_at                      start_station_name start_station_id  
-     Min.   :2023-10-01 00:02:02.00   Length:5854544     Length:5854544    
-     1st Qu.:2024-02-27 05:50:02.00   Class :character   Class :character  
-     Median :2024-06-06 13:17:11.44   Mode  :character   Mode  :character  
-     Mean   :2024-05-08 13:13:52.17                                        
-     3rd Qu.:2024-08-05 11:35:24.94                                        
-     Max.   :2024-09-30 23:59:52.55                                        
-                                                                           
-     end_station_name   end_station_id       start_lat       start_lng     
-     Length:5854544     Length:5854544     Min.   :41.64   Min.   :-87.94  
-     Class :character   Class :character   1st Qu.:41.88   1st Qu.:-87.66  
-     Mode  :character   Mode  :character   Median :41.90   Median :-87.64  
-                                           Mean   :41.90   Mean   :-87.65  
-                                           3rd Qu.:41.93   3rd Qu.:-87.63  
-                                           Max.   :42.07   Max.   :-87.52  
-                                                                           
-        end_lat         end_lng        member_casual     
-     Min.   :16.06   Min.   :-144.05   Length:5854544    
-     1st Qu.:41.88   1st Qu.: -87.66   Class :character  
-     Median :41.90   Median : -87.64   Mode  :character  
-     Mean   :41.90   Mean   : -87.65                     
-     3rd Qu.:41.93   3rd Qu.: -87.63                     
-     Max.   :87.96   Max.   :   1.72                     
-     NA's   :7441    NA's   :7441                        
+|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | start_station_id | end_station_name | end_station_id   | start_lat     | start_lng      | end_lat       | end_lng         | member_casual    |
+|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:---------------|:--------------|:----------------|:-----------------|
+|     | Length:5854544   | Length:5854544   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5854544     | Length:5854544   | Length:5854544   | Length:5854544   | Min. :41.64   | Min. :-87.94   | Min. :16.06   | Min. :-144.05   | Length:5854544   |
+|     | Class :character | Class :character | 1st Qu.:2024-02-27 05:34:06.75 | 1st Qu.:2024-02-27 05:50:02.00 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:41.88 | 1st Qu.:-87.66 | 1st Qu.:41.88 | 1st Qu.: -87.66 | Class :character |
+|     | Mode :character  | Mode :character  | Median :2024-06-06 12:55:34.65 | Median :2024-06-06 13:17:11.44 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :41.90 | Median :-87.64 | Median :41.90 | Median : -87.64 | Mode :character  |
+|     | NA               | NA               | Mean :2024-05-08 12:56:33.76   | Mean :2024-05-08 13:13:52.17   | NA                 | NA               | NA               | NA               | Mean :41.90   | Mean :-87.65   | Mean :41.90   | Mean : -87.65   | NA               |
+|     | NA               | NA               | 3rd Qu.:2024-08-05 11:12:35.00 | 3rd Qu.:2024-08-05 11:35:24.94 | NA                 | NA               | NA               | NA               | 3rd Qu.:41.93 | 3rd Qu.:-87.63 | 3rd Qu.:41.93 | 3rd Qu.: -87.63 | NA               |
+|     | NA               | NA               | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   | NA                 | NA               | NA               | NA               | Max. :42.07   | Max. :-87.52   | Max. :87.96   | Max. : 1.72     | NA               |
+|     | NA               | NA               | NA                             | NA                             | NA                 | NA               | NA               | NA               | NA            | NA             | NA’s :7441    | NA’s :7441      | NA               |
 
 ``` r
 dim(df)
@@ -165,17 +95,24 @@ df |>
     [1] 5854333       1
 
 ``` r
-colSums(is.na(df))
+kable(colSums(is.na(df)))
 ```
 
-               ride_id      rideable_type         started_at           ended_at 
-                     0                  0                  0                  0 
-    start_station_name   start_station_id   end_station_name     end_station_id 
-               1056535            1056535            1091792            1091792 
-             start_lat          start_lng            end_lat            end_lng 
-                     0                  0               7441               7441 
-         member_casual 
-                     0 
+|                    |       x |
+|:-------------------|--------:|
+| ride_id            |       0 |
+| rideable_type      |       0 |
+| started_at         |       0 |
+| ended_at           |       0 |
+| start_station_name | 1056535 |
+| start_station_id   | 1056535 |
+| end_station_name   | 1091792 |
+| end_station_id     | 1091792 |
+| start_lat          |       0 |
+| start_lng          |       0 |
+| end_lat            |    7441 |
+| end_lng            |    7441 |
+| member_casual      |       0 |
 
 # Data cleaning
 
@@ -191,24 +128,6 @@ dataset publishing as the main source of missing information. Let’s
 check a graph that could sustain this hypothesis
 
 ``` r
-global_theme <- function() {
-  theme_linedraw() +
-    theme(
-      axis.text.y = element_text(colour = "white", face = "bold"),
-      axis.text.x = element_text(colour = "white", face = "bold"),
-      axis.title.y = element_text(colour = "white", face = "bold"),
-      axis.title.x = element_text(colour = "white", face = "bold"),
-      plot.title = element_text(colour = "white", face = "bold"),
-      plot.subtitle = element_text(colour = "white", face = "bold"),
-      strip.background = element_rect(fill = "#262852", color = "#262852"),
-      strip.placement = "inside",
-      strip.text = element_text(colour = "white", face = "bold"),
-      panel.background = element_rect(fill = "#262852"),
-      plot.background = element_rect(fill = "#150F3A"),
-      plot.caption = element_text(colour = "white", face = "bold")
-    )
-}
-
 df |>
   filter(is.na(end_lng)) |>
   ggplot() +
@@ -224,7 +143,9 @@ df |>
   )
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-4-1.png)
+![We expected almost all rides of this kind to be at the end of the
+month to prove our
+hypothesis](README_files/figure-commonmark/Graph%20of%20rides%20with%20missing%20end%20location%20info-1.png)
 
 We can’t see anything that suggest anything conclusive. Since we can’t
 confidently recover the data lost, we should drop those entries.
@@ -298,7 +219,8 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 df |>
   select(start_station_id, start_station_name, start_lng, start_lat) |>
   filter(start_station_id == 13029) |>
-  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant = distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
+  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
+    distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
   filter(most_distant > 15) |>
   ggplot() +
   aes(x = most_distant) +
@@ -314,7 +236,7 @@ df |>
   )
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-7-1.png)
+![](README_files/figure-commonmark/unnamed-chunk-8-1.png)
 
 This graph shows that the coordinates present in our data are
 unreliable. Thus we need to look for another data source for information
@@ -356,53 +278,53 @@ stations |>
 stations |>
   group_by(lat, lon) |>
   filter(n() > 1) |>
-  ungroup()
+  ungroup()|>
+  kable()
 ```
 
-    # A tibble: 6 x 5
-      station_id                           short_name   name           lon       lat
-      <chr>                                <chr>        <chr>    <num:.6!> <num:.6!>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 "Wilto~ -87.652705 41.932418
-    2 d53ae727-5265-4b8e-a6ca-2a36dc0345c4 chargingstx2 "Wilto~ -87.652705 41.932418
-    3 1827484051430132402                  <NA>         "Publi~ -87.755520 41.978710
-    4 1715823821144840768                  <NA>         "Publi~ -87.662076 41.801354
-    5 1677249871073777806                  <NA>         "Publi~ -87.662076 41.801354
-    6 1827474404723843690                  <NA>         "Publi~ -87.755520 41.978710
+| station_id                           | short_name   | name                              |        lon |       lat |
+|:-------------------------------------|:-------------|:----------------------------------|-----------:|----------:|
+| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.652705 | 41.932418 |
+| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.652705 | 41.932418 |
+| 1827484051430132402                  | NA           | Public Rack - Forest Glen Station | -87.755520 | 41.978710 |
+| 1715823821144840768                  | NA           | Public Rack - Laflin St &51st ST  | -87.662076 | 41.801354 |
+| 1677249871073777806                  | NA           | Public Rack - Laflin St & 51st St | -87.662076 | 41.801354 |
+| 1827474404723843690                  | NA           | Public Rack - Peterson Park       | -87.755520 | 41.978710 |
 
 ``` r
 stations |>
   group_by(name) |>
   filter(n() > 1) |>
-  ungroup()
+  ungroup() |>
+  kable()
 ```
 
-    # A tibble: 6 x 5
-      station_id          short_name name                          lon       lat
-      <chr>               <chr>      <chr>                   <num:.6!> <num:.6!>
-    1 1978857650118994914 24409      Indiana Ave & 133rd St -87.617190 41.653800
-    2 1967727360320698512 24211      Western Ave & Lake St  -87.686680 41.884810
-    3 1984042930424753006 24394      Steelworkers Park      -87.530910 41.737930
-    4 1448642188027369086 <NA>       Indiana Ave & 133rd St -87.617054 41.653564
-    5 1594046379513303720 <NA>       Western Ave & Lake St  -87.685853 41.884606
-    6 1448642188027369090 <NA>       Steelworkers Park      -87.531067 41.738246
+| station_id          | short_name | name                   |        lon |       lat |
+|:--------------------|:-----------|:-----------------------|-----------:|----------:|
+| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.617190 | 41.653800 |
+| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.686680 | 41.884810 |
+| 1984042930424753006 | 24394      | Steelworkers Park      | -87.530910 | 41.737930 |
+| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.617054 | 41.653564 |
+| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.685853 | 41.884606 |
+| 1448642188027369090 | NA         | Steelworkers Park      | -87.531067 | 41.738246 |
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
 them on Google Maps. Here are my findings:
 
-- Wilton Ave & Diversey Pkwy has many places to park, maybe the company
-  takes those as 2 different stations
-- Forest Glen station and Peterson Park are 2 stations that are just a
-  meter or 2 of distance, we can consider both as one station
-- Laflin St & 51st St appears to be a typo, since there is just one
-  station nearby.
-- For those stations that share name but not coordinates, I’ve found
-  that they are just stations that are very close to each other.
-  Luckily, they have a different station id, and more over, only 1 of
-  each pair have shortname, which is the column used as station id in
-  our original dataframe.
+1)  Wilton Ave & Diversey Pkwy has many places to park, maybe the
+    company takes those as 2 different stations
+2)  Forest Glen station and Peterson Park are 2 stations that are just a
+    meter or 2 of distance, we can consider both as one station
+3)  Laflin St & 51st St appears to be a typo, since there is just one
+    station nearby.
+4)  For those stations that share name but not coordinates, I’ve found
+    that they are just stations that are very close to each other.
+    Luckily, they have a different station id, and more over, only 1 of
+    each pair have shortname, which is the column used as station id in
+    our original dataframe.
 
-Given those observations,
+Given those observations, we can merge
 
 ``` r
 stations |>
@@ -468,15 +390,6 @@ stations_with_id <- if (file.exists("coords_with_names.csv")) {
     )
 }
 ```
-
-    Rows: 1343123 Columns: 3
-    -- Column specification --------------------------------------------------------
-    Delimiter: ","
-    chr (1): station_id
-    dbl (2): latitude, longitude
-
-    i Use `spec()` to retrieve the full column specification for this data.
-    i Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 # Data cleaning
 
