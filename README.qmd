@@ -71,17 +71,18 @@ kable(summary(df))
 
 df |>
   dim() |>
-  set_names(c('height', 'width')) |>
-  kable()
+  kable(col.names = c("Dimension"))
 
 df |>
   select(ride_id) |>
   unique() |>
   dim() |>
-  set_names(c("height","width")) |>
-  kable()
+  kable(col.names = c("Dimensions"))
 
-kable(colSums(is.na(df)))
+df |>
+  is.na() |>
+  colSums() |>
+  kable(col.names = c("Column", "NA's"))
 ```
 
 # Data cleaning
@@ -141,7 +142,12 @@ confidently recover the data lost, we should drop those entries.
 
 ```{r}
 df <- filter(df, !is.na(end_lng))
-colSums(is.na(df))
+
+df |>
+  is.na() |>
+  colSums() |>
+  kable(col.names = c("Column", "NA's"))
+
 ```
 
 The other data that is missing is naming and id info from the stations. Reading
@@ -157,17 +163,22 @@ the stations info
 df |>
   select(start_station_id) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 
 df |>
   select(end_station_id) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
+
 
 df |>
   select(start_station_id, start_lat, start_lng) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
+
 ```
 
 We can deduce that this dataset has multiple coordinates for some stations.
@@ -220,6 +231,7 @@ if (!file.exists(stations_json)) {
     stations_json
   )
 }
+
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
@@ -228,11 +240,14 @@ stations <- fromJSON(stations_json) |>
 
 stations |>
   distinct(station_id) |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
+
 
 stations |>
   distinct(lat, lon) |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 
 stations |>
   group_by(lat, lon) |>

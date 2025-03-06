@@ -53,6 +53,8 @@ for (date in dates) {
 Read file as a tibble and first look at data.
 
 ``` r
+opts <- options(knitr.kable.NA = "")
+
 kable(head(df))
 ```
 
@@ -74,31 +76,43 @@ kable(summary(df))
 |     | Length:5854544   | Length:5854544   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5854544     | Length:5854544   | Length:5854544   | Length:5854544   | Min. :41.64   | Min. :-87.94   | Min. :16.06   | Min. :-144.05   | Length:5854544   |
 |     | Class :character | Class :character | 1st Qu.:2024-02-27 05:34:06.75 | 1st Qu.:2024-02-27 05:50:02.00 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:41.88 | 1st Qu.:-87.66 | 1st Qu.:41.88 | 1st Qu.: -87.66 | Class :character |
 |     | Mode :character  | Mode :character  | Median :2024-06-06 12:55:34.65 | Median :2024-06-06 13:17:11.44 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :41.90 | Median :-87.64 | Median :41.90 | Median : -87.64 | Mode :character  |
-|     | NA               | NA               | Mean :2024-05-08 12:56:33.76   | Mean :2024-05-08 13:13:52.17   | NA                 | NA               | NA               | NA               | Mean :41.90   | Mean :-87.65   | Mean :41.90   | Mean : -87.65   | NA               |
-|     | NA               | NA               | 3rd Qu.:2024-08-05 11:12:35.00 | 3rd Qu.:2024-08-05 11:35:24.94 | NA                 | NA               | NA               | NA               | 3rd Qu.:41.93 | 3rd Qu.:-87.63 | 3rd Qu.:41.93 | 3rd Qu.: -87.63 | NA               |
-|     | NA               | NA               | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   | NA                 | NA               | NA               | NA               | Max. :42.07   | Max. :-87.52   | Max. :87.96   | Max. : 1.72     | NA               |
-|     | NA               | NA               | NA                             | NA                             | NA                 | NA               | NA               | NA               | NA            | NA             | NA’s :7441    | NA’s :7441      | NA               |
+|     |                  |                  | Mean :2024-05-08 12:56:33.76   | Mean :2024-05-08 13:13:52.17   |                    |                  |                  |                  | Mean :41.90   | Mean :-87.65   | Mean :41.90   | Mean : -87.65   |                  |
+|     |                  |                  | 3rd Qu.:2024-08-05 11:12:35.00 | 3rd Qu.:2024-08-05 11:35:24.94 |                    |                  |                  |                  | 3rd Qu.:41.93 | 3rd Qu.:-87.63 | 3rd Qu.:41.93 | 3rd Qu.: -87.63 |                  |
+|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :42.07   | Max. :-87.52   | Max. :87.96   | Max. : 1.72     |                  |
+|     |                  |                  |                                |                                |                    |                  |                  |                  |               |                | NA’s :7441    | NA’s :7441      |                  |
 
 ``` r
-dim(df)
+df |>
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 5854544      13
+| Dimension |
+|----------:|
+|   5854544 |
+|        13 |
 
 ``` r
 df |>
   select(ride_id) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimensions"))
 ```
 
-    [1] 5854333       1
+| Dimensions |
+|-----------:|
+|    5854333 |
+|          1 |
 
 ``` r
-kable(colSums(is.na(df)))
+df |>
+  is.na() |>
+  colSums() |>
+  kable(col.names = c("Column", "NA's"))
 ```
 
-|                    |       x |
+| Column             |    NA’s |
 |:-------------------|--------:|
 | ride_id            |       0 |
 | rideable_type      |       0 |
@@ -152,17 +166,28 @@ confidently recover the data lost, we should drop those entries.
 
 ``` r
 df <- filter(df, !is.na(end_lng))
-colSums(is.na(df))
+
+df |>
+  is.na() |>
+  colSums() |>
+  kable(col.names = c("Column", "NA's"))
 ```
 
-               ride_id      rideable_type         started_at           ended_at 
-                     0                  0                  0                  0 
-    start_station_name   start_station_id   end_station_name     end_station_id 
-               1056535            1056535            1084351            1084351 
-             start_lat          start_lng            end_lat            end_lng 
-                     0                  0                  0                  0 
-         member_casual 
-                     0 
+| Column             |    NA’s |
+|:-------------------|--------:|
+| ride_id            |       0 |
+| rideable_type      |       0 |
+| started_at         |       0 |
+| ended_at           |       0 |
+| start_station_name | 1056535 |
+| start_station_id   | 1056535 |
+| end_station_name   | 1084351 |
+| end_station_id     | 1084351 |
+| start_lat          |       0 |
+| start_lng          |       0 |
+| end_lat            |       0 |
+| end_lng            |       0 |
+| member_casual      |       0 |
 
 The other data that is missing is naming and id info from the stations.
 Reading how the company operates, if you leave a divvy in any other
@@ -178,28 +203,40 @@ look at the stations info
 df |>
   select(start_station_id) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 1701    1
+| Dimension |
+|----------:|
+|      1701 |
+|         1 |
 
 ``` r
 df |>
   select(end_station_id) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 1711    1
+| Dimension |
+|----------:|
+|      1711 |
+|         1 |
 
 ``` r
 df |>
   select(start_station_id, start_lat, start_lng) |>
   unique() |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 1342701       3
+| Dimension |
+|----------:|
+|   1342701 |
+|         3 |
 
 We can deduce that this dataset has multiple coordinates for some
 stations. This might be due to how the coordinates and stations are
@@ -253,6 +290,7 @@ if (!file.exists(stations_json)) {
     stations_json
   )
 }
+
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
   as_tibble() |>
@@ -261,18 +299,26 @@ stations <- fromJSON(stations_json) |>
 
 stations |>
   distinct(station_id) |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 1801    1
+| Dimension |
+|----------:|
+|      1801 |
+|         1 |
 
 ``` r
 stations |>
   distinct(lat, lon) |>
-  dim()
+  dim() |>
+  kable(col.names = c("Dimension"))
 ```
 
-    [1] 1798    2
+| Dimension |
+|----------:|
+|      1798 |
+|         2 |
 
 ``` r
 stations |>
@@ -286,10 +332,10 @@ stations |>
 |:-------------------------------------|:-------------|:----------------------------------|-----------:|----------:|
 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.652705 | 41.932418 |
 | d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.652705 | 41.932418 |
-| 1827484051430132402                  | NA           | Public Rack - Forest Glen Station | -87.755520 | 41.978710 |
-| 1715823821144840768                  | NA           | Public Rack - Laflin St &51st ST  | -87.662076 | 41.801354 |
-| 1677249871073777806                  | NA           | Public Rack - Laflin St & 51st St | -87.662076 | 41.801354 |
-| 1827474404723843690                  | NA           | Public Rack - Peterson Park       | -87.755520 | 41.978710 |
+| 1827484051430132402                  |              | Public Rack - Forest Glen Station | -87.755520 | 41.978710 |
+| 1715823821144840768                  |              | Public Rack - Laflin St &51st ST  | -87.662076 | 41.801354 |
+| 1677249871073777806                  |              | Public Rack - Laflin St & 51st St | -87.662076 | 41.801354 |
+| 1827474404723843690                  |              | Public Rack - Peterson Park       | -87.755520 | 41.978710 |
 
 ``` r
 stations |>
@@ -304,9 +350,9 @@ stations |>
 | 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.617190 | 41.653800 |
 | 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.686680 | 41.884810 |
 | 1984042930424753006 | 24394      | Steelworkers Park      | -87.530910 | 41.737930 |
-| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.617054 | 41.653564 |
-| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.685853 | 41.884606 |
-| 1448642188027369090 | NA         | Steelworkers Park      | -87.531067 | 41.738246 |
+| 1448642188027369086 |            | Indiana Ave & 133rd St | -87.617054 | 41.653564 |
+| 1594046379513303720 |            | Western Ave & Lake St  | -87.685853 | 41.884606 |
+| 1448642188027369090 |            | Steelworkers Park      | -87.531067 | 41.738246 |
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
