@@ -63,16 +63,23 @@ for (date in dates) {
 Read file as a tibble and first look at data.
 
 ```{r}
+opts <- options(knitr.kable.NA = "")
+
 kable(head(df))
 
 kable(summary(df))
 
-dim(df)
+df |>
+  dim() |>
+  set_names(c('height', 'width')) |>
+  kable()
 
 df |>
   select(ride_id) |>
   unique() |>
-  dim()
+  dim() |>
+  set_names(c("height","width")) |>
+  kable()
 
 kable(colSums(is.na(df)))
 ```
