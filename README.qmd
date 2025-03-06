@@ -221,7 +221,7 @@ stations.
 
 
 Looking at the data page from divvy, there is a link for a json with
-information about location of the stations, let's incorporate that.
+information about location of stations, let's incorporate it.
 
 ```{r} 
 stations_json <- "stations.json"
@@ -234,7 +234,19 @@ if (!file.exists(stations_json)) {
 
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
-  as_tibble() |>
+  as_tibble()
+
+stations |>
+  head() |>
+  select(!rental_uris) |>
+  kable()
+
+stations |>
+  is.na() |>
+  colSums() |>
+  kable(col.names = c("Value", "NA's"))
+
+stations <- stations |>
   select(station_id, short_name, name, lon, lat) |>
   mutate(lon = num(lon, digits = 6), lat = num(lat, digits = 6))
 
@@ -252,14 +264,14 @@ stations |>
 stations |>
   group_by(lat, lon) |>
   filter(n() > 1) |>
-  ungroup()|>
-  kable()
+  ungroup() |>
+  kable(caption = "Stations with repeated coordinates")
 
 stations |>
   group_by(name) |>
   filter(n() > 1) |>
   ungroup() |>
-  kable()
+  kable(caption = "Stations with repeated name")
 ```
 
 This data is mostly clean, just some typos in the system that are an easy fix.

@@ -280,7 +280,7 @@ unreliable. Thus we need to look for another data source for information
 about coordinates of stations.
 
 Looking at the data page from divvy, there is a link for a json with
-information about location of the stations, let’s incorporate that.
+information about location of stations, let’s incorporate it.
 
 ``` r
 stations_json <- "stations.json"
@@ -293,10 +293,45 @@ if (!file.exists(stations_json)) {
 
 stations <- fromJSON(stations_json) |>
   _$data$stations |>
-  as_tibble() |>
+  as_tibble()
+
+stations |>
+  head() |>
+  select(!rental_uris) |>
+  kable()
+```
+
+|      lat | name                       | short_name | station_id                           | capacity |       lon | region_id | address |
+|---------:|:---------------------------|:-----------|:-------------------------------------|---------:|----------:|:----------|:--------|
+| 41.96861 | Milwaukee Ave & Ainslie St | 24370      | 1969221526359528022                  |       19 | -87.76108 | NA        | NA      |
+| 41.79375 | Mozart St & 55th St        | 24267      | 1966307477149012058                  |       11 | -87.69472 | NA        | NA      |
+| 41.81574 | Western Ave & 43rd St      | 24245      | 1943244109954931024                  |       15 | -87.68489 | NA        | NA      |
+| 41.93852 | Nagle Ave & Belmont Ave    | 24324      | 1981488728284770592                  |       16 | -87.78735 | NA        | NA      |
+| 41.74656 | Stony Island Ave & 82nd St | 583        | a3b29fae-a135-11e9-9cda-0a87ae2ba916 |       11 | -87.58601 | NA        | NA      |
+| 41.99008 | Kedvale Ave & Peterson Ave | 24159      | 1929967657204564894                  |       15 | -87.73171 | NA        | NA      |
+
+``` r
+stations |>
   select(station_id, short_name, name, lon, lat) |>
   mutate(lon = num(lon, digits = 6), lat = num(lat, digits = 6))
+```
 
+    # A tibble: 1,801 x 5
+       station_id                           short_name name            lon       lat
+       <chr>                                <chr>      <chr>     <num:.6!> <num:.6!>
+     1 1969221526359528022                  24370      Milwauk~ -87.761080 41.968610
+     2 1966307477149012058                  24267      Mozart ~ -87.694720 41.793750
+     3 1943244109954931024                  24245      Western~ -87.684890 41.815740
+     4 1981488728284770592                  24324      Nagle A~ -87.787350 41.938520
+     5 a3b29fae-a135-11e9-9cda-0a87ae2ba916 583        Stony I~ -87.586005 41.746559
+     6 1929967657204564894                  24159      Kedvale~ -87.731707 41.990076
+     7 a3b2d7d9-a135-11e9-9cda-0a87ae2ba916 594        Western~ -87.683392 41.805661
+     8 1929883678185797908                  23187      Lockwoo~ -87.758414 41.917594
+     9 a3b2d2b7-a135-11e9-9cda-0a87ae2ba916 593        Halsted~ -87.644874 41.787539
+    10 a3a547b8-a135-11e9-9cda-0a87ae2ba916 15491      63rd St~ -87.576324 41.780911
+    # i 1,791 more rows
+
+``` r
 stations |>
   distinct(station_id) |>
   dim() |>
@@ -324,35 +359,39 @@ stations |>
 stations |>
   group_by(lat, lon) |>
   filter(n() > 1) |>
-  ungroup()|>
-  kable()
+  ungroup() |>
+  kable(caption = "Stations with repeated coordinates")
 ```
 
-| station_id                           | short_name   | name                              |        lon |       lat |
-|:-------------------------------------|:-------------|:----------------------------------|-----------:|----------:|
-| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.652705 | 41.932418 |
-| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.652705 | 41.932418 |
-| 1827484051430132402                  |              | Public Rack - Forest Glen Station | -87.755520 | 41.978710 |
-| 1715823821144840768                  |              | Public Rack - Laflin St &51st ST  | -87.662076 | 41.801354 |
-| 1677249871073777806                  |              | Public Rack - Laflin St & 51st St | -87.662076 | 41.801354 |
-| 1827474404723843690                  |              | Public Rack - Peterson Park       | -87.755520 | 41.978710 |
+|      lat | name                              | rental_uris                         | short_name   | station_id                           | capacity |       lon | region_id | address                                                                                                                                  |
+|---------:|:----------------------------------|:------------------------------------|:-------------|:-------------------------------------|---------:|----------:|:----------|:-----------------------------------------------------------------------------------------------------------------------------------------|
+| 41.93242 | Wilton Ave & Diversey Pkwy        | https://chi.lft.to/lastmile_qr_scan | TA1306000014 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 |       35 | -87.65270 | NA        | NA                                                                                                                                       |
+| 41.93242 | Wilton Ave & Diversey Pkwy\*      | https://chi.lft.to/lastmile_qr_scan | chargingstx2 | d53ae727-5265-4b8e-a6ca-2a36dc0345c4 |       32 | -87.65270 | NA        | NA                                                                                                                                       |
+| 41.97871 | Public Rack - Forest Glen Station | https://chi.lft.to/lastmile_qr_scan | NA           | 1827484051430132402                  |        4 | -87.75552 | NA        | 5310 N Forest Glen Ave, Chicago, IL 60630, United States                                                                                 |
+| 41.80135 | Public Rack - Laflin St & 51st St | https://chi.lft.to/lastmile_qr_scan | NA           | 1677249871073777806                  |        2 | -87.66208 | NA        | 51st Street & Laflin, West 51st Street, New City, Chicago, Lake Township, Cook County, Illinois, 60609, United States                    |
+| 41.80135 | Public Rack - Laflin St &51st ST  | https://chi.lft.to/lastmile_qr_scan | NA           | 1715823821144840768                  |        2 | -87.66208 | NA        | 51st Street & Laflin, West 51st Street, Back of the Yards, New City, Chicago, Lake Township, Cook County, Illinois, 60609, United States |
+| 41.97871 | Public Rack - Peterson Park       | https://chi.lft.to/lastmile_qr_scan | NA           | 1827474404723843690                  |        2 | -87.75552 | NA        | 5310 N Forest Glen Ave, Chicago, IL 60630, United States                                                                                 |
+
+Stations with repeated coordinates
 
 ``` r
 stations |>
   group_by(name) |>
   filter(n() > 1) |>
   ungroup() |>
-  kable()
+  kable(caption = "Stations with repeated name")
 ```
 
-| station_id          | short_name | name                   |        lon |       lat |
-|:--------------------|:-----------|:-----------------------|-----------:|----------:|
-| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.617190 | 41.653800 |
-| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.686680 | 41.884810 |
-| 1984042930424753006 | 24394      | Steelworkers Park      | -87.530910 | 41.737930 |
-| 1448642188027369086 |            | Indiana Ave & 133rd St | -87.617054 | 41.653564 |
-| 1594046379513303720 |            | Western Ave & Lake St  | -87.685853 | 41.884606 |
-| 1448642188027369090 |            | Steelworkers Park      | -87.531067 | 41.738246 |
+|      lat | name                   | rental_uris                         | short_name | station_id          | capacity |       lon | region_id | address                                                                                                                  |
+|---------:|:-----------------------|:------------------------------------|:-----------|:--------------------|---------:|----------:|:----------|:-------------------------------------------------------------------------------------------------------------------------|
+| 41.88481 | Western Ave & Lake St  | https://chi.lft.to/lastmile_qr_scan | 24211      | 1967727360320698512 |       15 | -87.68668 | NA        | NA                                                                                                                       |
+| 41.65380 | Indiana Ave & 133rd St | https://chi.lft.to/lastmile_qr_scan | 24409      | 1978857650118994914 |       16 | -87.61719 | NA        | NA                                                                                                                       |
+| 41.73793 | Steelworkers Park      | https://chi.lft.to/lastmile_qr_scan | 24394      | 1984042930424753006 |       16 | -87.53091 | NA        | NA                                                                                                                       |
+| 41.73825 | Steelworkers Park      | https://chi.lft.to/lastmile_qr_scan | NA         | 1448642188027369090 |        6 | -87.53107 | NA        | Tribute to the Past, East 87th Street, South Chicago, Chicago, Cook County, Illinois, 60617, United States of America    |
+| 41.88461 | Western Ave & Lake St  | https://chi.lft.to/lastmile_qr_scan | NA         | 1594046379513303720 |        6 | -87.68585 | NA        | Illinois Currency Exchange, 2349, West Lake Street, Near West Side, Chicago, Cook County, Illinois, 60612, United States |
+| 41.65356 | Indiana Ave & 133rd St | https://chi.lft.to/lastmile_qr_scan | NA         | 1448642188027369086 |        6 | -87.61705 | NA        | 210, East 133rd Street, Riverdale, Chicago, Cook County, Illinois, 60827, United States of America                       |
+
+Stations with repeated name
 
 This data is mostly clean, just some typos in the system that are an
 easy fix. Since I can count those errors with one hand, I manually check
@@ -379,10 +418,11 @@ stations |>
   )
 ```
 
-    # A tibble: 1 x 5
-      station_id                           short_name   name           lon       lat
-      <chr>                                <chr>        <chr>    <num:.6!> <num:.6!>
-    1 a3a3a282-a135-11e9-9cda-0a87ae2ba916 TA1306000014 Wilton~ -87.652705 41.932418
+    # A tibble: 1 x 9
+        lat name  rental_uris$android short_name station_id capacity   lon region_id
+      <dbl> <chr> <chr>               <chr>      <chr>         <int> <dbl> <chr>    
+    1  41.9 Wilt~ https://chi.lft.to~ TA1306000~ a3a3a282-~       35 -87.7 <NA>     
+    # i 2 more variables: rental_uris$ios <chr>, address <chr>
 
 Awesome, now we have a clean dataset of the stations info
 
