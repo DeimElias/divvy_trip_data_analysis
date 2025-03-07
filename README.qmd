@@ -141,6 +141,7 @@ We can't see anything that suggest anything conclusive. Since we can't
 confidently recover the data lost, we should drop those entries.
 
 ```{r}
+#| label: "leaned data from missing entries "
 df <- filter(df, !is.na(end_lng))
 
 df |>
@@ -160,6 +161,7 @@ coordinates are very far away from the range, let's have some deeper look at
 the stations info
 
 ```{r}
+#| label: "Multiple stations with share information"
 df |>
   select(start_station_id) |>
   unique() |>
@@ -190,7 +192,9 @@ are some coordinates that are very far away from the city where Divvy is
 working. We may want to use the location of the stations to look for some
 trends. Let's find an example of this problematic.
 
-```{R} 
+```{r}
+#| label: "Graph of distance distribution"
+
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
   distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })
@@ -224,6 +228,7 @@ Looking at the data page from divvy, there is a link for a json with
 information about location of stations, let's incorporate it.
 
 ```{r} 
+#| label: "Stations dataframe added and cleaned"
 stations_json <- "stations.json"
 if (!file.exists(stations_json)) {
   download.file(
@@ -247,8 +252,7 @@ stations |>
   kable(col.names = c("Value", "NA's"))
 
 stations <- stations |>
-  select(station_id, short_name, name, lon, lat) |>
-  mutate(lon = num(lon, digits = 6), lat = num(lat, digits = 6))
+  select(station_id, short_name, name, lon, lat)
 
 stations |>
   distinct(station_id) |>
@@ -260,6 +264,13 @@ stations |>
   distinct(lat, lon) |>
   dim() |>
   kable(col.names = c("Dimension"))
+
+
+stations |>
+  group_by(station_id) |>
+  filter(n() > 1) |>
+  ungroup() |>
+  kable(caption = "Stations with repeated id")
 
 stations |>
   group_by(lat, lon) |>
@@ -279,30 +290,37 @@ Since I can count those errors with one hand, I manually check them on Google
 Maps. Here are my findings:
 
   1) Wilton Ave & Diversey Pkwy has many places to park, maybe the company takes
-  those as 2 different stations
+  those as 2 different stations, we can merge them.
   2) Forest Glen station and Peterson Park are 2 stations that are just a meter
-  or 2 of distance, we can consider both as one station
+  or 2 of distance, we can consider both as one station.
   3) Laflin St & 51st St appears to be a typo, since there is just one station
-  nearby.
+  nearby. We will convert those 2 stations into one.
   4) For those stations that share name but not coordinates, I've found that
   they are just stations that are very close to each other. Luckily, they have
   a different station id, and more over, only 1 of each pair have shortname,
   which is the column used as station id in our original dataframe.
 
-Given those observations, we can merge 
+Let's implement those solutions:
 
 ```{r}
-stations |>
-  filter(
-    station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == ""
-  )
+stations <- stations |>
+  filter(station_id != "1448642188027369090") |>
+  filter(station_id != "1594046379513303720") |>
+  filter(station_id != "1448642188027369086")
+#NOTE: WTF!!! If we connect those statements with the | operator, with multiple
+#lines, it doesn't work
+
+df |>
+  left_join(stations, by = join_by(start_station_name == name)) |>
+  select(ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, start_station_name)
+
 ```
 
 Awesome, now we have a clean dataset of the stations info
 
 ```{r}
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
-  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
+  distm(c(x1, y1), c(x2, y2), fun = distHaversine) |>
 })
 
 assert_value <- function(value) {
