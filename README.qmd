@@ -310,10 +310,24 @@ stations <- stations |>
 #NOTE: WTF!!! If we connect those statements with the | operator, with multiple
 #lines, it doesn't work
 
-df |>
-  left_join(stations, by = join_by(start_station_name == name)) |>
-  select(ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, start_station_name)
+iff <- Vectorize(function(name, change, value) {
+  if (name == change) {
+    value
+  } else {
+    name
+  }
+}, "name")
 
+df |>
+  select(ride_id:start_station_name, end_station_name, member_casual) |>
+  left_join(stations, by = join_by(start_station_name == name)) |>
+  mutate(start_station_id = station_id, start_lon = lon, start_lat  = lat) |>
+  select(!station_id:lat) |>
+  left_join(stations, by = join_by(end_station_name == name)) |>
+  mutate(end_station_id = station_id, end_lon = lon, end_lat  = lat) |>
+  select(!station_id:lat) |>
+  mutate(start_station_id = iff(start_station_id, "d53ae727-5265-4b8e-a6ca-2a36dc0345c4", "a3a3a282-a135-11e9-9cda-0a87ae2ba916"),
+start_station_name =iff(start_station_name, "Wilton Ave & Diversey Pkwy*", "Wilton Ave & Diversey Pkwy"))
 ```
 
 Awesome, now we have a clean dataset of the stations info
