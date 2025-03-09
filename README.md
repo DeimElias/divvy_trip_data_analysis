@@ -256,8 +256,10 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 df |>
   select(start_station_id, start_station_name, start_lng, start_lat) |>
   filter(start_station_id == 13029) |>
-  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
-    distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
+  mutate(
+    mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
+      distm_v(mean_lat, mean_lng, start_lat, start_lng)
+  ) |>
   filter(most_distant > 15) |>
   ggplot() +
   aes(x = most_distant) +
@@ -301,14 +303,14 @@ stations |>
   kable()
 ```
 
-|      lat | name                       | short_name | station_id                           | capacity |       lon | region_id | address |
-|---------:|:---------------------------|:-----------|:-------------------------------------|---------:|----------:|:----------|:--------|
-| 41.96861 | Milwaukee Ave & Ainslie St | 24370      | 1969221526359528022                  |       19 | -87.76108 | NA        | NA      |
-| 41.79375 | Mozart St & 55th St        | 24267      | 1966307477149012058                  |       11 | -87.69472 | NA        | NA      |
-| 41.81574 | Western Ave & 43rd St      | 24245      | 1943244109954931024                  |       15 | -87.68489 | NA        | NA      |
-| 41.93852 | Nagle Ave & Belmont Ave    | 24324      | 1981488728284770592                  |       16 | -87.78735 | NA        | NA      |
-| 41.74656 | Stony Island Ave & 82nd St | 583        | a3b29fae-a135-11e9-9cda-0a87ae2ba916 |       11 | -87.58601 | NA        | NA      |
-| 41.99008 | Kedvale Ave & Peterson Ave | 24159      | 1929967657204564894                  |       15 | -87.73171 | NA        | NA      |
+| station_id                           |      lat |       lon | name                         | capacity | short_name   | region_id | address |
+|:-------------------------------------|---------:|----------:|:-----------------------------|---------:|:-------------|:----------|:--------|
+| 1955905507044284968                  | 41.92227 | -87.80202 | Nordica Ave & Medill Ave     |       15 | 21378        | NA        | NA      |
+| 1934289361049585738                  | 41.82810 | -87.69468 | California Ave & 36th St     |       15 | 21338        | NA        | NA      |
+| a3b0fae6-a135-11e9-9cda-0a87ae2ba916 | 42.01270 | -87.66606 | Glenwood Ave & Touhy Ave     |       15 | 525          | NA        | NA      |
+| a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 | 41.81409 | -87.59701 | Woodlawn Ave & Lake Park Ave |       15 | KA1503000065 | NA        | NA      |
+| a3acdae2-a135-11e9-9cda-0a87ae2ba916 | 41.78008 | -87.62975 | Wentworth Ave & 63rd St      |       11 | KA1503000025 | NA        | NA      |
+| a3a9f76a-a135-11e9-9cda-0a87ae2ba916 | 41.92153 | -87.70732 | Kedzie Ave & Palmer Ct       |       15 | 13292        | NA        | NA      |
 
 ``` r
 stations |>
@@ -319,14 +321,14 @@ stations |>
 
 | Value      | NA’s |
 |:-----------|-----:|
-| lat        |    0 |
-| name       |    0 |
-| android    |    0 |
-| ios        |    0 |
-| short_name |  872 |
 | station_id |    0 |
-| capacity   |    0 |
+| lat        |    0 |
 | lon        |    0 |
+| name       |    0 |
+| capacity   |    0 |
+| ios        |    0 |
+| android    |    0 |
+| short_name |  872 |
 | region_id  | 1787 |
 | address    |  929 |
 
@@ -383,8 +385,8 @@ stations |>
 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.65270 | 41.93242 |
 | d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.65270 | 41.93242 |
 | 1827484051430132402                  | NA           | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
-| 1677249871073777806                  | NA           | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
 | 1715823821144840768                  | NA           | Public Rack - Laflin St &51st ST  | -87.66208 | 41.80135 |
+| 1677249871073777806                  | NA           | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
 | 1827474404723843690                  | NA           | Public Rack - Peterson Park       | -87.75552 | 41.97871 |
 
 Stations with repeated coordinates
@@ -399,12 +401,12 @@ stations |>
 
 | station_id          | short_name | name                   |       lon |      lat |
 |:--------------------|:-----------|:-----------------------|----------:|---------:|
-| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
 | 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
+| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
 | 1984042930424753006 | 24394      | Steelworkers Park      | -87.53091 | 41.73793 |
-| 1448642188027369090 | NA         | Steelworkers Park      | -87.53107 | 41.73825 |
-| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
 | 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
+| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
+| 1448642188027369090 | NA         | Steelworkers Park      | -87.53107 | 41.73825 |
 
 Stations with repeated name
 
@@ -413,31 +415,93 @@ easy fix. Since I can count those errors with one hand, I manually check
 them on Google Maps. Here are my findings:
 
 1)  Wilton Ave & Diversey Pkwy has many places to park, maybe the
-    company takes those as 2 different stations
+    company takes those as 2 different stations, we can merge them.
 2)  Forest Glen station and Peterson Park are 2 stations that are just a
-    meter or 2 of distance, we can consider both as one station
+    meter or 2 of distance, we can consider both as one station.
 3)  Laflin St & 51st St appears to be a typo, since there is just one
-    station nearby.
+    station nearby. We will convert those 2 stations into one.
 4)  For those stations that share name but not coordinates, I’ve found
     that they are just stations that are very close to each other.
     Luckily, they have a different station id, and more over, only 1 of
     each pair have shortname, which is the column used as station id in
     our original dataframe.
 
-Given those observations, we can merge
+Let’s implement those solutions:
 
 ``` r
-stations |>
-  filter(
-    station_id == "a3a3a282-a135-11e9-9cda-0a87ae2ba916" | station_id == ""
+stations <- stations |>
+  filter(station_id != "1448642188027369090") |>
+  filter(station_id != "1594046379513303720") |>
+  filter(station_id != "1448642188027369086")
+# NOTE: WTF!!! If we connect those statements with the | operator, with multiple
+# lines, it doesn't work
+
+df <- df |>
+  select(ride_id:start_station_name, end_station_name, member_casual) |>
+  left_join(stations, by = join_by(start_station_name == name)) |>
+  mutate(start_station_id = station_id, start_lon = lon, start_lat = lat) |>
+  select(!station_id:lat) |>
+  left_join(stations, by = join_by(end_station_name == name)) |>
+  mutate(end_station_id = station_id, end_lon = lon, end_lat = lat) |>
+  select(!station_id:lat) |>
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "d53ae727-5265-4b8e-a6ca-2a36dc0345c4",
+      "a3a3a282-a135-11e9-9cda-0a87ae2ba916",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Wilton Ave & Diversey Pkwy*",
+      "Wilton Ave & Diversey Pkwy", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "d53ae727-5265-4b8e-a6ca-2a36dc0345c4",
+      "a3a3a282-a135-11e9-9cda-0a87ae2ba916", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Wilton Ave & Diversey Pkwy*",
+      "Wilton Ave & Diversey Pkwy", end_station_name
+    )
+  ) |>
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "1715823821144840768",
+      "1677249871073777806",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Public Rack - Laflin St & 51st ST",
+      "Public Rack - Laflin St & 51st St", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "1715823821144840768",
+      "1677249871073777806", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Public Rack - Laflin St & 51st ST",
+      "Public Rack - Laflin St & 51st St", end_station_name
+    )
+  ) |>
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "1827484051430132402",
+      "1827474404723843690",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Public Rack - Forest Glen Station",
+      "Public Rack - Peterson Park", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "1827484051430132402",
+      "1827474404723843690", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Public Rack - Forest Glen Station",
+      "Public Rack - Peterson Park", end_station_name
+    )
   )
 ```
-
-    # A tibble: 1 x 9
-        lat name  rental_uris$android short_name station_id capacity   lon region_id
-      <dbl> <chr> <chr>               <chr>      <chr>         <int> <dbl> <chr>    
-    1  41.9 Wilt~ https://chi.lft.to~ TA1306000~ a3a3a282-~       35 -87.7 <NA>     
-    # i 2 more variables: rental_uris$ios <chr>, address <chr>
 
 Awesome, now we have a clean dataset of the stations info
 

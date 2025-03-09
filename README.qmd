@@ -148,7 +148,6 @@ df |>
   is.na() |>
   colSums() |>
   kable(col.names = c("Column", "NA's"))
-
 ```
 
 The other data that is missing is naming and id info from the stations. Reading
@@ -180,7 +179,6 @@ df |>
   unique() |>
   dim() |>
   kable(col.names = c("Dimension"))
-
 ```
 
 We can deduce that this dataset has multiple coordinates for some stations.
@@ -202,8 +200,10 @@ distm_v <- Vectorize(function(x1, y1, x2, y2) {
 df |>
   select(start_station_id, start_station_name, start_lng, start_lat) |>
   filter(start_station_id == 13029) |>
-  mutate(mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
-    distm_v(mean_lat, mean_lng, start_lat, start_lng)) |>
+  mutate(
+    mean_lng = mean(start_lng), mean_lat = mean(start_lat), most_distant =
+      distm_v(mean_lat, mean_lng, start_lat, start_lng)
+  ) |>
   filter(most_distant > 15) |>
   ggplot() +
   aes(x = most_distant) +
@@ -307,34 +307,81 @@ stations <- stations |>
   filter(station_id != "1448642188027369090") |>
   filter(station_id != "1594046379513303720") |>
   filter(station_id != "1448642188027369086")
-#NOTE: WTF!!! If we connect those statements with the | operator, with multiple
-#lines, it doesn't work
+# NOTE: WTF!!! If we connect those statements with the | operator, with multiple
+# lines, it doesn't work
 
-iff <- Vectorize(function(name, change, value) {
-  if (name == change) {
-    value
-  } else {
-    name
-  }
-}, "name")
-
-df |>
+df <- df |>
   select(ride_id:start_station_name, end_station_name, member_casual) |>
   left_join(stations, by = join_by(start_station_name == name)) |>
-  mutate(start_station_id = station_id, start_lon = lon, start_lat  = lat) |>
+  mutate(start_station_id = station_id, start_lon = lon, start_lat = lat) |>
   select(!station_id:lat) |>
   left_join(stations, by = join_by(end_station_name == name)) |>
-  mutate(end_station_id = station_id, end_lon = lon, end_lat  = lat) |>
+  mutate(end_station_id = station_id, end_lon = lon, end_lat = lat) |>
   select(!station_id:lat) |>
-  mutate(start_station_id = iff(start_station_id, "d53ae727-5265-4b8e-a6ca-2a36dc0345c4", "a3a3a282-a135-11e9-9cda-0a87ae2ba916"),
-start_station_name =iff(start_station_name, "Wilton Ave & Diversey Pkwy*", "Wilton Ave & Diversey Pkwy"))
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "d53ae727-5265-4b8e-a6ca-2a36dc0345c4",
+      "a3a3a282-a135-11e9-9cda-0a87ae2ba916",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Wilton Ave & Diversey Pkwy*",
+      "Wilton Ave & Diversey Pkwy", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "d53ae727-5265-4b8e-a6ca-2a36dc0345c4",
+      "a3a3a282-a135-11e9-9cda-0a87ae2ba916", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Wilton Ave & Diversey Pkwy*",
+      "Wilton Ave & Diversey Pkwy", end_station_name
+    )
+  ) |>
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "1715823821144840768",
+      "1677249871073777806",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Public Rack - Laflin St & 51st ST",
+      "Public Rack - Laflin St & 51st St", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "1715823821144840768",
+      "1677249871073777806", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Public Rack - Laflin St & 51st ST",
+      "Public Rack - Laflin St & 51st St", end_station_name
+    )
+  ) |>
+  mutate(
+    start_station_id = if_else(
+      start_station_id == "1827484051430132402",
+      "1827474404723843690",
+      start_station_id
+    ),
+    start_station_name = if_else(
+      start_station_name == "Public Rack - Forest Glen Station",
+      "Public Rack - Peterson Park", start_station_name
+    ),
+    end_station_id = if_else(
+      end_station_id == "1827484051430132402",
+      "1827474404723843690", end_station_id
+    ),
+    end_station_name = if_else(
+      end_station_name == "Public Rack - Forest Glen Station",
+      "Public Rack - Peterson Park", end_station_name
+    )
+  )
 ```
 
 Awesome, now we have a clean dataset of the stations info
 
 ```{r}
 distm_v <- Vectorize(function(x1, y1, x2, y2) {
-  distm(c(x1, y1), c(x2, y2), fun = distHaversine) |>
+  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
 })
 
 assert_value <- function(value) {
