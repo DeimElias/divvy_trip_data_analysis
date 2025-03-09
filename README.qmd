@@ -63,6 +63,7 @@ for (date in dates) {
 Read file as a tibble and first look at data.
 
 ```{r}
+#| label: "Exploration of raw data"
 opts <- options(knitr.kable.NA = "")
 
 kable(head(df))
@@ -303,6 +304,7 @@ Maps. Here are my findings:
 Let's implement those solutions:
 
 ```{r}
+#| label: "Final cleaning"
 stations <- stations |>
   filter(station_id != "1448642188027369090") |>
   filter(station_id != "1594046379513303720") |>
@@ -374,63 +376,87 @@ df <- df |>
       end_station_name == "Public Rack - Forest Glen Station",
       "Public Rack - Peterson Park", end_station_name
     )
-  )
+  ) |>
+  mutate(ride_duration = as.integer(ended_at - started_at))
+
+df |>
+  head() |>
+  kable()
 ```
 
-Awesome, now we have a clean dataset of the stations info
+```{r} 
+#| label: "Final review of cleaned data"
+
+kable(summary(df))
+```
+
+We have now finished our data cleaning process. Now that our data is ready, let's continue with our analysis.
+
+## Data analysis
 
 ```{r}
-distm_v <- Vectorize(function(x1, y1, x2, y2) {
-  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
-})
+#| label: "First analysis"
 
-assert_value <- function(value) {
-  if (dim(value)[1] == 0) {
-    tibble(station_id = "")
-  } else {
-    value
-  }
-}
 
-closest_station_margin <- function(margin) {
-  function(latitude, longitude) {
-    station_closest <- stations |>
-      select(lat, lon, station_id) |>
-      filter(
-        lat < latitude + margin &
-          lat > latitude - margin &
-          lon < longitude + margin &
-          lon > longitude - margin
-      ) |>
-      mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
-      slice_min(distance, n = 1, with_ties = FALSE) |>
-      assert_value() |>
-      _$station_id
-  }
-}
+df |>
+ select(member_casual, ride_duration) |>
+ group_by(member_casual) |>
+ summarise(avg_ride_duration = mean(ride_duration), count = n()) |>
+  ggplot() + aes(x=member_casual, y = avg_ride_duration) + geom_col(color = "#000000") + global_theme()
+```
+```{r}
 
-stations_geoinfo <- select(df, start_lat, start_lng) |>
-  rename(lat = start_lat, lng = start_lng) |>
-  bind_rows(select(df, end_lat, end_lng) |>
-    rename(lat = end_lat, lng = end_lng)) |>
-  unique()
-
-stations_get_closest <- closest_station_margin(0.001)
-
-plan(multicore, workers = 3)
-stations_with_id <- if (file.exists("coords_with_names.csv")) {
-  read_csv("coords_with_names.csv")
-} else {
-  stations.geoinfo |>
-    rename(latitude = lat, longitude = lng) |>
-    slice_sample(n = 50000) |>
-    mutate(
-      station_id = future_map2_chr(latitude, longitude, stations_get_closest)
-    )
-}
+df |>
+  filter(ride_duration < 0) |>
+  ggplot() + aes(x = mday(started_at)) + geom_histogram(binwidth = 1, color = "#000000", fill = "#06CEFD") + global_theme() +
+  facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) 
+# p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
+# assert_value <- function(value) {
+#   if (dim(value)[1] == 0) {
+#     tibble(station_id = "")
+#   } else {
+#     value
+#   }
+# }
+#
+# closest_station_margin <- function(margin) {
+#   function(latitude, longitude) {
+#     station_closest <- stations |>
+#       select(lat, lon, station_id) |>
+#       filter(
+#         lat < latitude + margin &
+#           lat > latitude - margin &
+#           lon < longitude + margin &
+#           lon > longitude - margin
+#       ) |>
+#       mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
+#       slice_min(distance, n = 1, with_ties = FALSE) |>
+#       assert_value() |>
+#       _$station_id
+#   }
+# }
+#
+# stations_geoinfo <- select(df, start_lat, start_lng) |>
+#   rename(lat = start_lat, lng = start_lng) |>
+#   bind_rows(select(df, end_lat, end_lng) |>
+#     rename(lat = end_lat, lng = end_lng)) |>
+#   unique()
+#
+# stations_get_closest <- closest_station_margin(0.001)
+#
+# plan(multicore, workers = 3)
+# stations_with_id <- if (file.exists("coords_with_names.csv")) {
+#   read_csv("coords_with_names.csv")
+# } else {
+#   stations.geoinfo |>
+#     rename(latitude = lat, longitude = lng) |>
+#     slice_sample(n = 50000) |>
+#     mutate(
+#       station_id = future_map2_chr(latitude, longitude, stations_get_closest)
+#     )
+# }
 ```
 
-# Data cleaning
 
 ```{r}
 # graoh <- ggplot(data = df) +

@@ -500,63 +500,108 @@ df <- df |>
       end_station_name == "Public Rack - Forest Glen Station",
       "Public Rack - Peterson Park", end_station_name
     )
-  )
+  ) |>
+  mutate(ride_duration = as.integer(ended_at - started_at))
+
+df |>
+  head() |>
+  kable()
 ```
 
-Awesome, now we have a clean dataset of the stations info
+| ride_id          | rideable_type | started_at          | ended_at            | start_station_name                   | end_station_name            | member_casual | start_station_id                     | start_lon | start_lat | end_station_id                       |   end_lon |  end_lat | ride_duration |
+|:-----------------|:--------------|:--------------------|:--------------------|:-------------------------------------|:----------------------------|:--------------|:-------------------------------------|----------:|----------:|:-------------------------------------|----------:|---------:|--------------:|
+| 4449097279F8BBE7 | classic_bike  | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |           773 |
+| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St            | Sheffield Ave & Webster Ave | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |           729 |
+| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | Franklin St & Lake St       | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |           260 |
+| F92714CC6B019B96 | classic_bike  | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St            | Franklin St & Lake St       | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |           326 |
+| 5E34BA5DE945A9CC | classic_bike  | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St            | Franklin St & Lake St       | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |           690 |
+| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |           862 |
 
 ``` r
-distm_v <- Vectorize(function(x1, y1, x2, y2) {
-  distm(c(x1, y1), c(x2, y2), fun = distHaversine)
-})
-
-assert_value <- function(value) {
-  if (dim(value)[1] == 0) {
-    tibble(station_id = "")
-  } else {
-    value
-  }
-}
-
-closest_station_margin <- function(margin) {
-  function(latitude, longitude) {
-    station_closest <- stations |>
-      select(lat, lon, station_id) |>
-      filter(
-        lat < latitude + margin &
-          lat > latitude - margin &
-          lon < longitude + margin &
-          lon > longitude - margin
-      ) |>
-      mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
-      slice_min(distance, n = 1, with_ties = FALSE) |>
-      assert_value() |>
-      _$station_id
-  }
-}
-
-stations_geoinfo <- select(df, start_lat, start_lng) |>
-  rename(lat = start_lat, lng = start_lng) |>
-  bind_rows(select(df, end_lat, end_lng) |>
-    rename(lat = end_lat, lng = end_lng)) |>
-  unique()
-
-stations_get_closest <- closest_station_margin(0.001)
-
-plan(multicore, workers = 3)
-stations_with_id <- if (file.exists("coords_with_names.csv")) {
-  read_csv("coords_with_names.csv")
-} else {
-  stations.geoinfo |>
-    rename(latitude = lat, longitude = lng) |>
-    slice_sample(n = 50000) |>
-    mutate(
-      station_id = future_map2_chr(latitude, longitude, stations_get_closest)
-    )
-}
+kable(summary(df))
 ```
 
-# Data cleaning
+|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | end_station_name | member_casual    | start_station_id | start_lon     | start_lat     | end_station_id   | end_lon       | end_lat       | ride_duration |
+|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:--------------|:-----------------|:--------------|:--------------|:--------------|
+|     | Length:5847103   | Length:5847103   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5847103     | Length:5847103   | Length:5847103   | Length:5847103   | Min. :-87.8   | Min. :41.6    | Length:5847103   | Min. :-87.8   | Min. :41.6    | Min. :-999391 |
+|     | Class :character | Class :character | 1st Qu.:2024-02-27 02:45:42.00 | 1st Qu.:2024-02-27 03:43:53.50 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | 1st Qu.: 331  |
+|     | Mode :character  | Mode :character  | Median :2024-06-06 12:51:30.67 | Median :2024-06-06 13:09:38.19 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :-87.6 | Median :41.9  | Mode :character  | Median :-87.6 | Median :41.9  | Median : 580  |
+|     |                  |                  | Mean :2024-05-08 12:54:21.68   | Mean :2024-05-08 13:09:46.89   |                    |                  |                  |                  | Mean :-87.6   | Mean :41.9    |                  | Mean :-87.6   | Mean :41.9    | Mean : 925    |
+|     |                  |                  | 3rd Qu.:2024-08-05 11:40:13.60 | 3rd Qu.:2024-08-05 11:57:43.35 |                    |                  |                  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  | 3rd Qu.: 1028 |
+|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :-87.5   | Max. :42.1    |                  | Max. :-87.5   | Max. :42.1    | Max. : 90562  |
+|     |                  |                  |                                |                                |                    |                  |                  |                  | NA’s :1071544 | NA’s :1071544 |                  | NA’s :1098661 | NA’s :1098661 |               |
+
+We have now finished our data cleaning process. Now that our data is
+ready, let’s continue with our analysis.
+
+## Data analysis
+
+``` r
+df |>
+ select(member_casual, ride_duration) |>
+ group_by(member_casual) |>
+ summarise(avg_ride_duration = mean(ride_duration), count = n()) |>
+  ggplot() + aes(x=member_casual, y = avg_ride_duration) + geom_col(color = "#000000") + global_theme()
+```
+
+![](README_files/figure-commonmark/First%20analysis-1.png)
+
+``` r
+df |>
+  filter(ride_duration < 0) |>
+  ggplot() + aes(x = mday(started_at)) + geom_histogram(binwidth = 1, color = "#000000", fill = "#06CEFD") + global_theme() +
+  facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) 
+```
+
+![](README_files/figure-commonmark/unnamed-chunk-13-1.png)
+
+``` r
+# p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
+# assert_value <- function(value) {
+#   if (dim(value)[1] == 0) {
+#     tibble(station_id = "")
+#   } else {
+#     value
+#   }
+# }
+#
+# closest_station_margin <- function(margin) {
+#   function(latitude, longitude) {
+#     station_closest <- stations |>
+#       select(lat, lon, station_id) |>
+#       filter(
+#         lat < latitude + margin &
+#           lat > latitude - margin &
+#           lon < longitude + margin &
+#           lon > longitude - margin
+#       ) |>
+#       mutate(distance = distm_v(longitude, latitude, lon, lat)) |>
+#       slice_min(distance, n = 1, with_ties = FALSE) |>
+#       assert_value() |>
+#       _$station_id
+#   }
+# }
+#
+# stations_geoinfo <- select(df, start_lat, start_lng) |>
+#   rename(lat = start_lat, lng = start_lng) |>
+#   bind_rows(select(df, end_lat, end_lng) |>
+#     rename(lat = end_lat, lng = end_lng)) |>
+#   unique()
+#
+# stations_get_closest <- closest_station_margin(0.001)
+#
+# plan(multicore, workers = 3)
+# stations_with_id <- if (file.exists("coords_with_names.csv")) {
+#   read_csv("coords_with_names.csv")
+# } else {
+#   stations.geoinfo |>
+#     rename(latitude = lat, longitude = lng) |>
+#     slice_sample(n = 50000) |>
+#     mutate(
+#       station_id = future_map2_chr(latitude, longitude, stations_get_closest)
+#     )
+# }
+```
 
 ``` r
 # graoh <- ggplot(data = df) +
