@@ -40,6 +40,7 @@ library(sf)
 library(jsonlite)
 library(geosphere)
 library(furrr)
+library(scales)
 ```
 
 Loading data from source, if not it is available locally.
@@ -392,10 +393,12 @@ df |>
 kable(summary(df))
 ```
 
-We have now finished our data cleaning process. Now that our data is ready, let's continue with our analysis.
+We have now finished our data cleaning process. Now that our data is ready,
+let's continue with our analysis.
 
 ## Data analysis
-first we will take a look at the average time of usage of the service
+first we will take a look at the average time of usage of the service with
+different types of bicycles between members and casual users
 
 ```{r}
 #| label: "First analysis"
@@ -405,22 +408,47 @@ df |>
   select(member_casual, rideable_type, ride_duration) |>
   group_by(member_casual, rideable_type) |>
   summarise(avg_ride_duration = mean(ride_duration)) |>
-  ggplot() + aes(x = member_casual, y = avg_ride_duration) +
-  geom_col(color = "#000000", fill = c("#B7FA8A","#06CEFD", "#B7FA8A","#06CEFD", "#B7FA8A","#06CEFD")) +
+  ggplot() +
+  aes(x = member_casual, y = avg_ride_duration, fill = member_casual) +
+  geom_col(color = "#000000") +
   facet_wrap(~rideable_type) +
-  global_theme()
+  global_theme() +
+  scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
+  theme(legend.position = "none")
 ```
-```{r}
+We can see that casual users tend to use the service for longer periods, let's
+take a look at the distribution of usage
 
+```{r}
 df |>
-  select(started_at, ride_duration) |>
-  group_by(month(started_at), mday(started_at)) |>
-  mutate(avg_ride_duration = mean(ride_duration)) |>
-  ungroup() |>
-  select(started_at, avg_ride_duration) |>
-  ggplot() + aes(x = mday(started_at), y = max(avg_ride_duration)) + geom_col(color = "#000000", fill = "#06CEFD") + global_theme() +
-  facet_wrap(vars(month(started_at, label = TRUE, abbr = FALSE))) 
-df
+  select(member_casual, rideable_type, ride_duration) |>
+  group_by(member_casual, rideable_type) |>
+  summarize(mean_duration = round(mean(ride_duration), 2)) |>
+  ggplot() +
+  geom_freqpoly(
+    data = df |> select(member_casual, rideable_type, ride_duration),
+    aes(x = ride_duration, color = member_casual)
+  ) +
+  geom_vline(aes(xintercept = mean_duration, color = member_casual)) +
+  geom_label(
+    aes(x = mean_duration, label = mean_duration, fill = member_casual),
+    y = seq(50000, 300000, 50000)
+  ) +
+  scale_x_log10(label = label_number()) +
+  scale_y_continuous(label = label_number()) +
+  facet_wrap(~rideable_type) +
+  global_theme() +
+  labs(
+    y = "Number of rides",
+    x = "time interval",
+    title = "Distribution of ride duration per customer type and vehicle",
+    subtitle = "Data from Oct-2023 to Oct-2024",
+    caption = "logarithmic scale for better visuals"
+  ) +
+  scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
+  scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
+  theme(legend.position = "none")
+
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {
 #   if (dim(value)[1] == 0) {
