@@ -427,27 +427,39 @@ df |>
   ggplot() +
   geom_freqpoly(
     data = df |> select(member_casual, rideable_type, ride_duration),
-    aes(x = ride_duration, color = member_casual)
+    aes(x = ride_duration, color = member_casual),
+    show.legend = FALSE
   ) +
-  geom_vline(aes(xintercept = mean_duration, color = member_casual)) +
+  geom_vline(
+    aes(xintercept = mean_duration, color = member_casual),
+    linetype = 2,
+    show.legend = FALSE
+  )+
   geom_label(
     aes(x = mean_duration, label = mean_duration, fill = member_casual),
-    y = seq(50000, 300000, 50000)
+    y = c(50000, 100000, 5000, 100000, 50000, 10000)
   ) +
   scale_x_log10(label = label_number()) +
   scale_y_continuous(label = label_number()) +
-  facet_wrap(~rideable_type) +
+  facet_wrap(~rideable_type, dir = "v", scales = "free_y") +
   global_theme() +
   labs(
     y = "Number of rides",
     x = "time interval",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
-    caption = "logarithmic scale for better visuals"
+    caption = "logarithmic scale for better visuals",
+    fill = "Mean ride duration",
+    color = ""
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
-  theme(legend.position = "none")
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom"
+  )
 
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {
