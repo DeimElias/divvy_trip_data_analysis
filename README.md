@@ -304,14 +304,14 @@ stations |>
   kable()
 ```
 
-| station_id                           |      lat |       lon | name                         | capacity | short_name   | region_id | address |
-|:-------------------------------------|---------:|----------:|:-----------------------------|---------:|:-------------|:----------|:--------|
-| 1955905507044284968                  | 41.92227 | -87.80202 | Nordica Ave & Medill Ave     |       15 | 21378        | NA        | NA      |
-| 1934289361049585738                  | 41.82810 | -87.69468 | California Ave & 36th St     |       15 | 21338        | NA        | NA      |
-| a3b0fae6-a135-11e9-9cda-0a87ae2ba916 | 42.01270 | -87.66606 | Glenwood Ave & Touhy Ave     |       15 | 525          | NA        | NA      |
-| a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 | 41.81409 | -87.59701 | Woodlawn Ave & Lake Park Ave |       15 | KA1503000065 | NA        | NA      |
-| a3acdae2-a135-11e9-9cda-0a87ae2ba916 | 41.78008 | -87.62975 | Wentworth Ave & 63rd St      |       11 | KA1503000025 | NA        | NA      |
-| a3a9f76a-a135-11e9-9cda-0a87ae2ba916 | 41.92153 | -87.70732 | Kedzie Ave & Palmer Ct       |       15 | 13292        | NA        | NA      |
+|      lat | name                       | short_name | station_id                           | capacity |       lon | region_id | address |
+|---------:|:---------------------------|:-----------|:-------------------------------------|---------:|----------:|:----------|:--------|
+| 41.96861 | Milwaukee Ave & Ainslie St | 24370      | 1969221526359528022                  |       19 | -87.76108 | NA        | NA      |
+| 41.79375 | Mozart St & 55th St        | 24267      | 1966307477149012058                  |       11 | -87.69472 | NA        | NA      |
+| 41.81574 | Western Ave & 43rd St      | 24245      | 1943244109954931024                  |       15 | -87.68489 | NA        | NA      |
+| 41.93852 | Nagle Ave & Belmont Ave    | 24324      | 1981488728284770592                  |       16 | -87.78735 | NA        | NA      |
+| 41.74656 | Stony Island Ave & 82nd St | 583        | a3b29fae-a135-11e9-9cda-0a87ae2ba916 |       11 | -87.58601 | NA        | NA      |
+| 41.99008 | Kedvale Ave & Peterson Ave | 24159      | 1929967657204564894                  |       15 | -87.73171 | NA        | NA      |
 
 ``` r
 stations |>
@@ -322,14 +322,14 @@ stations |>
 
 | Value      | NA’s |
 |:-----------|-----:|
-| station_id |    0 |
 | lat        |    0 |
-| lon        |    0 |
 | name       |    0 |
-| capacity   |    0 |
-| ios        |    0 |
 | android    |    0 |
+| ios        |    0 |
 | short_name |  872 |
+| station_id |    0 |
+| capacity   |    0 |
+| lon        |    0 |
 | region_id  | 1787 |
 | address    |  929 |
 
@@ -386,8 +386,8 @@ stations |>
 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.65270 | 41.93242 |
 | d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.65270 | 41.93242 |
 | 1827484051430132402                  | NA           | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
-| 1715823821144840768                  | NA           | Public Rack - Laflin St &51st ST  | -87.66208 | 41.80135 |
 | 1677249871073777806                  | NA           | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
+| 1715823821144840768                  | NA           | Public Rack - Laflin St &51st ST  | -87.66208 | 41.80135 |
 | 1827474404723843690                  | NA           | Public Rack - Peterson Park       | -87.75552 | 41.97871 |
 
 Stations with repeated coordinates
@@ -402,12 +402,12 @@ stations |>
 
 | station_id          | short_name | name                   |       lon |      lat |
 |:--------------------|:-----------|:-----------------------|----------:|---------:|
-| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
 | 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
+| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
 | 1984042930424753006 | 24394      | Steelworkers Park      | -87.53091 | 41.73793 |
-| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
-| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
 | 1448642188027369090 | NA         | Steelworkers Park      | -87.53107 | 41.73825 |
+| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
+| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
 
 Stations with repeated name
 
@@ -524,15 +524,15 @@ df |>
 kable(summary(df))
 ```
 
-|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | end_station_name | member_casual    | start_station_id | start_lon     | start_lat     | end_station_id   | end_lon       | end_lat       | ride_duration |
-|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:--------------|:-----------------|:--------------|:--------------|:--------------|
-|     | Length:5847103   | Length:5847103   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5847103     | Length:5847103   | Length:5847103   | Length:5847103   | Min. :-87.8   | Min. :41.6    | Length:5847103   | Min. :-87.8   | Min. :41.6    | Min. :-999391 |
-|     | Class :character | Class :character | 1st Qu.:2024-02-27 02:45:42.00 | 1st Qu.:2024-02-27 03:43:53.50 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | 1st Qu.: 331  |
-|     | Mode :character  | Mode :character  | Median :2024-06-06 12:51:30.67 | Median :2024-06-06 13:09:38.19 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :-87.6 | Median :41.9  | Mode :character  | Median :-87.6 | Median :41.9  | Median : 580  |
-|     |                  |                  | Mean :2024-05-08 12:54:21.68   | Mean :2024-05-08 13:09:46.89   |                    |                  |                  |                  | Mean :-87.6   | Mean :41.9    |                  | Mean :-87.6   | Mean :41.9    | Mean : 925    |
-|     |                  |                  | 3rd Qu.:2024-08-05 11:40:13.60 | 3rd Qu.:2024-08-05 11:57:43.35 |                    |                  |                  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  | 3rd Qu.: 1028 |
-|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :-87.5   | Max. :42.1    |                  | Max. :-87.5   | Max. :42.1    | Max. : 90562  |
-|     |                  |                  |                                |                                |                    |                  |                  |                  | NA’s :1071544 | NA’s :1071544 |                  | NA’s :1098661 | NA’s :1098661 |               |
+|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | end_station_name | member_casual    | start_station_id | start_lon     | start_lat     | end_station_id   | end_lon       | end_lat       | ride_duration   | station_fee   |
+|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:--------------|:-----------------|:--------------|:--------------|:----------------|:--------------|
+|     | Length:5845369   | Length:5845369   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5845369     | Length:5845369   | Length:5845369   | Length:5845369   | Min. :-87.8   | Min. :41.6    | Length:5845369   | Min. :-87.8   | Min. :41.6    | Min. : 1.0      | Mode :logical |
+|     | Class :character | Class :character | 1st Qu.:2024-02-27 04:55:42.00 | 1st Qu.:2024-02-27 05:16:32.00 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | 1st Qu.: 331.0  | FALSE:4762233 |
+|     | Mode :character  | Mode :character  | Median :2024-06-06 13:01:48.50 | Median :2024-06-06 13:21:01.54 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :-87.6 | Median :41.9  | Mode :character  | Median :-87.6 | Median :41.9  | Median : 580.0  | TRUE :1083136 |
+|     |                  |                  | Mean :2024-05-08 13:02:16.15   | Mean :2024-05-08 13:17:42.60   |                    |                  |                  |                  | Mean :-87.6   | Mean :41.9    |                  | Mean :-87.6   | Mean :41.9    | Mean : 926.2    |               |
+|     |                  |                  | 3rd Qu.:2024-08-05 11:48:57.01 | 3rd Qu.:2024-08-05 12:06:05.80 |                    |                  |                  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  | 3rd Qu.: 1028.0 |               |
+|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :-87.5   | Max. :42.1    |                  | Max. :-87.5   | Max. :42.1    | Max. :90562.0   |               |
+|     |                  |                  |                                |                                |                    |                  |                  |                  | NA’s :1070550 | NA’s :1070550 |                  | NA’s :1097434 | NA’s :1097434 |                 |               |
 
 We have now finished our data cleaning process. Now that our data is
 ready, let’s continue with our analysis.
@@ -576,10 +576,11 @@ df |>
     aes(xintercept = mean_duration, color = member_casual),
     linetype = 2,
     show.legend = FALSE
-  )+
+  ) +
   geom_label(
     aes(x = mean_duration, label = mean_duration, fill = member_casual),
-    y = c(50000, 100000, 5000, 200000, 150000, 10000)
+    y = c(250000, 250000, 12500, 100000, 100000, 5000),
+    hjust = 0
   ) +
   scale_x_log10(label = label_number()) +
   scale_y_continuous(label = label_number()) +
@@ -587,12 +588,11 @@ df |>
   global_theme() +
   labs(
     y = "Number of rides",
-    x = "time interval",
+    x = "Time interval",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
     caption = "logarithmic scale for better visuals",
     fill = "Mean ride duration",
-    color = ""
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
