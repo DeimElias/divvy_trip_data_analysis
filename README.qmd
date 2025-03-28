@@ -403,9 +403,9 @@ different types of bicycles between members and casual users
 ```{r}
 #| label: "First analysis"
 
-
 df |>
   select(member_casual, rideable_type, ride_duration) |>
+  slice_min(n = as.integer(dim(df)[1] * 0.999), order_by = ride_duration) |>
   group_by(member_casual, rideable_type) |>
   summarise(avg_ride_duration = mean(ride_duration)) |>
   ggplot() +
@@ -414,7 +414,10 @@ df |>
   facet_wrap(~rideable_type) +
   global_theme() +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  labs(
+    caption = "Top 99.9% lower ride duration",
+  )
 ```
 We can see that casual users tend to use the service for longer periods, let's
 take a look at the distribution of usage
@@ -424,11 +427,14 @@ take a look at the distribution of usage
 #| fig-width: 8
 df |>
   select(member_casual, rideable_type, ride_duration) |>
+  slice_min(n = as.integer(dim(df)[1] * 0.999), order_by = ride_duration) |>
   group_by(member_casual, rideable_type) |>
   summarize(mean_duration = round(mean(ride_duration), 2)) |>
   ggplot() +
   geom_freqpoly(
-    data = df |> select(member_casual, rideable_type, ride_duration),
+    data = df |>
+      select(member_casual, rideable_type, ride_duration) |>
+      slice_min(n = as.integer(dim(df)[1] * 0.999), order_by = ride_duration),
     aes(x = ride_duration, color = member_casual),
     show.legend = FALSE
   ) +
@@ -451,7 +457,7 @@ df |>
     x = "Time interval",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
-    caption = "logarithmic scale for better visuals",
+    caption = "Top 99.9% lower ride duration",
     fill = "Mean ride duration",
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
@@ -462,6 +468,10 @@ df |>
     legend.title = element_text(color = "white"),
     legend.position = "bottom"
   )
+
+```
+
+```{r}
 
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {
