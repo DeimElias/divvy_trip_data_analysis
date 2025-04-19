@@ -1,6 +1,8 @@
 ---
 title: Divvy case study
 format: gfm
+#  html:
+#    theme: darkly
 execute:
   cache: true
   echo: true
@@ -378,7 +380,7 @@ df <- df |>
       "Public Rack - Peterson Park", end_station_name
     )
   ) |>
-  mutate(ride_duration = as.integer(ended_at - started_at)) |>
+  mutate(ride_duration = as.integer((ended_at - started_at)/60)) |>
   filter(ride_duration > 0) |>
   mutate(station_fee = is.na(end_station_name))
 
@@ -427,14 +429,14 @@ take a look at the distribution of usage
 #| fig-width: 8
 df |>
   select(member_casual, rideable_type, ride_duration) |>
-  slice_min(n = as.integer(dim(df)[1] * 0.999), order_by = ride_duration) |>
+  slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
   group_by(member_casual, rideable_type) |>
   summarize(mean_duration = round(mean(ride_duration), 2)) |>
   ggplot() +
   geom_freqpoly(
     data = df |>
       select(member_casual, rideable_type, ride_duration) |>
-      slice_min(n = as.integer(dim(df)[1] * 0.999), order_by = ride_duration),
+      slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration),
     aes(x = ride_duration, color = member_casual),
     show.legend = FALSE
   ) +
@@ -448,16 +450,15 @@ df |>
     y = c(250000, 250000, 12500, 100000, 100000, 5000),
     hjust = 0
   ) +
-  scale_x_log10(label = label_number()) +
   scale_y_continuous(label = label_number()) +
   facet_wrap(~rideable_type, dir = "v", scales = "free_y") +
   global_theme() +
   labs(
     y = "Number of rides",
-    x = "Time interval",
+    x = "Time interval (minutes)",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
-    caption = "Top 99.9% lower ride duration",
+    caption = "Top 99% lower ride duration",
     fill = "Mean ride duration",
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
@@ -470,8 +471,29 @@ df |>
   )
 
 ```
+On average, casual users tend to use the service for longer periods of time,
+but they have less rides overall. Since casual users pay for each minute they
+use the service, we can use this a selling point to them. On the other hand, we
+may have to further explore this difference in usage.
+
+Some other interesting visualization is the next one:
 
 ```{r}
+
+df |>
+  slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
+  ggplot() +
+  aes(x = wday(started_at, week_start = 1), fill = member_casual) +
+  geom_histogram(show.legend = FALSE) +
+  facet_grid(cols = vars(member_casual), rows = vars(quarter(started_at), fiscal_start = 4)) +
+  labs(
+    x="day of the week",
+    title = "Rides per day of the week",
+    subtitle = "Data from Agust, 2024",
+    y = "Number of rides"
+  ) +
+  scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
+  global_theme()
 
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {

@@ -2,3 +2,6 @@
 *.zip
 .R*
 README_cache
+/README_files/libs
+/README_files/figure-html
+*.html
