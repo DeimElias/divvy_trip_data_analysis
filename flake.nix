@@ -11,7 +11,7 @@
       });
     in
     {
-      overlays.default = final: prev: rec {
+      overlays.default = final: prev: {
         rEnv = final.rWrapper.override {
           packages = with final.rPackages; [ knitr tidyverse sf mapview jsonlite geosphere furrr styler quarto languageserver scales];
         };
@@ -23,7 +23,7 @@
             [
               rEnv
               pandoc
-              glibcLocales
+              glibcLocalesUtf8
               nix
               quarto
             ];

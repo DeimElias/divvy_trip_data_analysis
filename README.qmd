@@ -425,8 +425,9 @@ We can see that casual users tend to use the service for longer periods, let's
 take a look at the distribution of usage
 
 ```{r}
+#| label: "Distribution of rides duration, per bike type"
 #| fig-height: 8
-#| fig-width: 8
+#| fig-width: 10
 df |>
   select(member_casual, rideable_type, ride_duration) |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
@@ -479,22 +480,42 @@ may have to further explore this difference in usage.
 Some other interesting visualization is the next one:
 
 ```{r}
+#| label: "Rides per day of the week per season"
+#| fig-height: 8
+#| fig-width: 10
+
+seasons <- c("1" = "Spring", "2" = "Summer", "3" = "Autumn", "4" = "Winter")
 
 df |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
   ggplot() +
-  aes(x = wday(started_at, week_start = 1), fill = member_casual) +
-  geom_histogram(show.legend = FALSE) +
-  facet_grid(cols = vars(member_casual), rows = vars(quarter(started_at), fiscal_start = 4)) +
+  aes(x = wday(started_at, week_start = 1, label = TRUE), fill = member_casual) +
+  geom_histogram(
+    stat = "count",
+    position = position_dodge(),
+    color = "black"
+  ) +
+  facet_grid(
+    rows = vars(quarter(started_at, fiscal_start = 4)),
+    labeller = labeller(.default = seasons)
+  ) +
   labs(
-    x="day of the week",
+    x = "Day of the week",
     title = "Rides per day of the week",
-    subtitle = "Data from Agust, 2024",
-    y = "Number of rides"
+    subtitle = "Data from Oct-2023 to Sep-24",
+    y = "Number of rides",
+    fill = "Type of user",
   ) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
-  global_theme()
+  global_theme() +
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom",
+  )
 
+c(1)
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {
 #   if (dim(value)[1] == 0) {

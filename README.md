@@ -610,7 +610,7 @@ df |>
   )
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-13-1.png)
+![](README_files/figure-commonmark/Distribution%20of%20rides%20duration,%20per%20bike%20type-1.png)
 
 On average, casual users tend to use the service for longer periods of
 time, but they have less rides overall. Since casual users pay for each
@@ -620,23 +620,45 @@ the other hand, we may have to further explore this difference in usage.
 Some other interesting visualization is the next one:
 
 ``` r
+seasons <- c("1" = "Spring", "2" = "Summer", "3" = "Autumn", "4" = "Winter")
+
 df |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
   ggplot() +
   aes(x = wday(started_at, week_start = 1), fill = member_casual) +
-  geom_histogram(show.legend = FALSE) +
-  facet_grid(cols = vars(member_casual), rows = vars(quarter(started_at), fiscal_start = 4)) +
+  geom_histogram(
+    stat = "count",
+    position = position_dodge(),
+    color = "black"
+  ) +
+  facet_grid(
+    rows = vars(quarter(started_at, fiscal_start = 4)),
+    labeller = labeller(.default = seasons)
+  ) +
   labs(
-    x="day of the week",
+    x = "Day of the week",
     title = "Rides per day of the week",
     subtitle = "Data from Agust, 2024",
-    y = "Number of rides"
+    y = "Number of rides",
+    fill = "Type of user",
   ) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
-  global_theme()
+  global_theme() +
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom",
+  )
 ```
 
-![](README_files/figure-commonmark/unnamed-chunk-14-1.png)
+![](README_files/figure-commonmark/Rides%20per%20day%20of%20the%20week%20per%20season-1.png)
+
+``` r
+c(1)
+```
+
+    [1] 1
 
 ``` r
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
