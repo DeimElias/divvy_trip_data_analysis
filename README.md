@@ -551,11 +551,14 @@ df |>
   ggplot() +
   aes(x = member_casual, y = avg_ride_duration, fill = member_casual) +
   geom_col(color = "#000000") +
-  facet_wrap(~rideable_type) +
+  facet_wrap(~rideable_type, labeller = as_labeller(function(string)  gsub("_", " ", string)) ) +
   global_theme() +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
   theme(legend.position = "none") +
   labs(
+    title = "Average ride duation per user", 
+    y = "Average ride duration", 
+    x = "Type of user",
     caption = "Top 99.9% lower ride duration",
   )
 ```
@@ -621,14 +624,57 @@ Some other interesting visualization is the next one:
 
 ``` r
 seasons <- c("1" = "Spring", "2" = "Summer", "3" = "Autumn", "4" = "Winter")
+weekdays <- c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun")
+df |>
+  slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
+  mutate(wday = as.numeric(wday(started_at, week_start = 1)),
+    season = quarter(started_at, fiscal_start = 4)
+  ) |>
+  select(member_casual, wday, season) |>
+  group_by(member_casual, season, wday) |>
+  summarize(count = n()) |>
+  ungroup() |>
+  mutate(wday = factor(wday, levels = 1:7)) |>
+  ggplot() +
+  aes(x = wday, y = count, color = member_casual, group = member_casual) +
+  geom_point() +
+  geom_line() +
+  scale_x_discrete(breaks = 1:7,
+    labels = weekdays
+  ) +
+  facet_grid(
+    rows = vars(season),
+    labeller = labeller(.default = seasons)
+  ) +
+  labs(
+    x = "Day of the week",
+    title = "Rides per day of the week",
+    subtitle = "Data from Oct-2023 to Sep-24",
+    y = "Number of rides",
+    color = "Type of user",
+  ) +
+  scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
+  global_theme() +
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom",
+  )
+```
 
+![](README_files/figure-commonmark/Rides%20per%20day%20of%20the%20week%20per%20season-1.png)
+
+``` r
 df |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
   ggplot() +
-  aes(x = wday(started_at, week_start = 1), fill = member_casual) +
+  aes(x = wday(started_at, week_start = 1, label = TRUE),
+    fill = member_casual
+  ) +
   geom_histogram(
     stat = "count",
-    position = position_dodge(),
+    position = "dodge",
     color = "black"
   ) +
   facet_grid(
@@ -638,7 +684,7 @@ df |>
   labs(
     x = "Day of the week",
     title = "Rides per day of the week",
-    subtitle = "Data from Agust, 2024",
+    subtitle = "Data from Oct-2023 to Sep-24",
     y = "Number of rides",
     fill = "Type of user",
   ) +
@@ -652,7 +698,12 @@ df |>
   )
 ```
 
-![](README_files/figure-commonmark/Rides%20per%20day%20of%20the%20week%20per%20season-1.png)
+![](README_files/figure-commonmark/Rides%20per%20day%20of%20the%20week%20per%20season-2.png)
+
+Where we can see two things, that the number of rides increases in
+spring and summer, we even find that on weekends the gap between members
+and casual users, with Saturdays on summer having more casual users
+overall.
 
 ``` r
 c(1)
