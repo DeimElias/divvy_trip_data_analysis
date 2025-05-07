@@ -564,31 +564,35 @@ df |>
 Where we can see two things, that the number of rides increases in spring and
 summer, we even find that on weekends the gap between members and casual
 users, with Saturdays on  summer having more casual users overall.
-```{R}
+```{r}
 #| label: "Usage per hour, day and season"
 #| fig-height: 8
 #| fig-width: 10
-
-ggplot(data=df) +
+df |>
+  ggplot() +
   aes(x = hour(started_at), color = member_casual) +
-  geom_freqpoly(stat= "count", bins=24) +
+  geom_density(n = 24) +
   geom_vline(xintercept = c(8, 17), color = "red", linetype = 2) +
+  scale_x_continuous(breaks = c(0, 8, 12, 17, 23)) +
   facet_grid(
-    cols=vars(quarter(started_at, fiscal_start = 4)),
-    rows =vars(wday(started_at, week_start = 1, label = TRUE)),
+    cols = vars(quarter(started_at, fiscal_start = 4)),
+    rows = vars(wday(started_at, week_start = 1, label = TRUE)),
     labeller = labeller(.cols = seasons)
   ) +
   labs(
-    x="Hour", 
-    title = "Rides per day of the week, grouped by season", 
-    subtitle = "Data from Oct-2023 to Sep-2024", 
-    y = "Number of rides",
+    x = "Hour",
+    title = "Rides per day of the week, grouped by season",
+    subtitle = "Data from Oct-2023 to Sep-2024",
+    y = "Density of rides",
     color = "Type of user"
-  )+
+  ) +
   global_theme() +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
   global_theme() +
   theme(
+    axis.text.x = element_text(
+      color = c("white", "red", "white", "red", "white")
+    ),
     legend.background = element_rect(fill = "#150F3A", color = "white"),
     legend.text = element_text(color = "white"),
     legend.title = element_text(color = "white"),
@@ -597,14 +601,14 @@ ggplot(data=df) +
 
 ```
 
-We can see that usage from members and casual users doesn't vary much through
-seasons. We could confirm this by viewing this graph with a density stat.
+Looking at this graph, we can see that usage is mostly identical between
+members and casual users, across the year. Something interesting is that during
+weekdays member have an spike of usage at 8am, which is very consistent across
+all the year.
 
-We can see more clearly that usage is quite similar on weekends, fact which
-points our attention to how different turns out to be the usage of the service
-between member and casual users. We can detect 2 spikes of usage at 8am and
-5pm, which align perfectly between season. We can suggest that members use the
-service in high traffic hours, 
+Given that, aside from this spike, most usage is quite similar between users,
+we should explore why members have this spike in usage, maybe some trend will
+appear if we dig dipper inside our dataframe.
 
 ```{r} 
 
