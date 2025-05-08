@@ -607,11 +607,18 @@ weekdays member have an spike of usage at 8am, which is very consistent across
 all the year.
 
 Given that, aside from this spike, most usage is quite similar between users,
-we should explore why members have this spike in usage, maybe some trend will
-appear if we dig dipper inside our dataframe.
+we should explore why members have this spike in usage. Looking up for this
+trend, let's look at the following plot.
 
 ```{r} 
+df |>
+  select(ride_id, start_station_id, start_station_name, started_at, start_lat, start_lon, member_casual) |>
+  st_as_sf(coords = c("start_lon", "start_lat")) |>
+  st_crs() |>
+  mapview()
 
+  
+  
 c(1)
 # p  <- ggplot(data = visual) + aes(x = member_casual, y= avg_time_used) + geom_col()
 # assert_value <- function(value) {
