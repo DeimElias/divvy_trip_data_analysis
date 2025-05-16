@@ -59,28 +59,28 @@ opts <- options(knitr.kable.NA = "")
 kable(head(df))
 ```
 
-| ride_id          | rideable_type | started_at          | ended_at            | start_station_name                   | start_station_id | end_station_name            | end_station_id | start_lat | start_lng |  end_lat |   end_lng | member_casual |
-|:-----------------|:--------------|:--------------------|:--------------------|:-------------------------------------|:-----------------|:----------------------------|:---------------|----------:|----------:|---------:|----------:|:--------------|
-| 4449097279F8BBE7 | classic_bike  | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | 620              | Sheffield Ave & Webster Ave | TA1309000033   |  41.89820 | -87.63754 | 41.92154 | -87.65382 | member        |
-| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St            | TA1306000003     | Sheffield Ave & Webster Ave | TA1309000033   |  41.88864 | -87.64441 | 41.92154 | -87.65382 | member        |
-| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | 620              | Franklin St & Lake St       | TA1307000111   |  41.89807 | -87.63751 | 41.88584 | -87.63550 | member        |
-| F92714CC6B019B96 | classic_bike  | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St            | TA1306000003     | Franklin St & Lake St       | TA1307000111   |  41.88872 | -87.64445 | 41.88584 | -87.63550 | member        |
-| 5E34BA5DE945A9CC | classic_bike  | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St            | TA1306000003     | Franklin St & Lake St       | TA1307000111   |  41.88872 | -87.64445 | 41.88584 | -87.63550 | member        |
-| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | 620              | Sheffield Ave & Webster Ave | TA1309000033   |  41.89812 | -87.63753 | 41.92154 | -87.65382 | member        |
+| ride_id | rideable_type | started_at | ended_at | start_station_name | start_station_id | end_station_name | end_station_id | start_lat | start_lng | end_lat | end_lng | member_casual |
+|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|---:|:---|
+| 4449097279F8BBE7 | classic_bike | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | 620 | Sheffield Ave & Webster Ave | TA1309000033 | 41.89820 | -87.63754 | 41.92154 | -87.65382 | member |
+| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St | TA1306000003 | Sheffield Ave & Webster Ave | TA1309000033 | 41.88864 | -87.64441 | 41.92154 | -87.65382 | member |
+| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | 620 | Franklin St & Lake St | TA1307000111 | 41.89807 | -87.63751 | 41.88584 | -87.63550 | member |
+| F92714CC6B019B96 | classic_bike | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St | TA1306000003 | Franklin St & Lake St | TA1307000111 | 41.88872 | -87.64445 | 41.88584 | -87.63550 | member |
+| 5E34BA5DE945A9CC | classic_bike | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St | TA1306000003 | Franklin St & Lake St | TA1307000111 | 41.88872 | -87.64445 | 41.88584 | -87.63550 | member |
+| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | 620 | Sheffield Ave & Webster Ave | TA1309000033 | 41.89812 | -87.63753 | 41.92154 | -87.65382 | member |
 
 ``` r
 kable(summary(df))
 ```
 
-|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | start_station_id | end_station_name | end_station_id   | start_lat     | start_lng      | end_lat       | end_lng         | member_casual    |
-|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:---------------|:--------------|:----------------|:-----------------|
-|     | Length:5854544   | Length:5854544   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5854544     | Length:5854544   | Length:5854544   | Length:5854544   | Min. :41.64   | Min. :-87.94   | Min. :16.06   | Min. :-144.05   | Length:5854544   |
-|     | Class :character | Class :character | 1st Qu.:2024-02-27 05:34:06.75 | 1st Qu.:2024-02-27 05:50:02.00 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:41.88 | 1st Qu.:-87.66 | 1st Qu.:41.88 | 1st Qu.: -87.66 | Class :character |
-|     | Mode :character  | Mode :character  | Median :2024-06-06 12:55:34.65 | Median :2024-06-06 13:17:11.44 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :41.90 | Median :-87.64 | Median :41.90 | Median : -87.64 | Mode :character  |
-|     |                  |                  | Mean :2024-05-08 12:56:33.76   | Mean :2024-05-08 13:13:52.17   |                    |                  |                  |                  | Mean :41.90   | Mean :-87.65   | Mean :41.90   | Mean : -87.65   |                  |
-|     |                  |                  | 3rd Qu.:2024-08-05 11:12:35.00 | 3rd Qu.:2024-08-05 11:35:24.94 |                    |                  |                  |                  | 3rd Qu.:41.93 | 3rd Qu.:-87.63 | 3rd Qu.:41.93 | 3rd Qu.: -87.63 |                  |
-|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :42.07   | Max. :-87.52   | Max. :87.96   | Max. : 1.72     |                  |
-|     |                  |                  |                                |                                |                    |                  |                  |                  |               |                | NA’s :7441    | NA’s :7441      |                  |
+|  | ride_id | rideable_type | started_at | ended_at | start_station_name | start_station_id | end_station_name | end_station_id | start_lat | start_lng | end_lat | end_lng | member_casual |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|  | Length:5854544 | Length:5854544 | Min. :2023-10-01 00:00:05.00 | Min. :2023-10-01 00:02:02.00 | Length:5854544 | Length:5854544 | Length:5854544 | Length:5854544 | Min. :41.64 | Min. :-87.94 | Min. :16.06 | Min. :-144.05 | Length:5854544 |
+|  | Class :character | Class :character | 1st Qu.:2024-02-27 05:34:06.75 | 1st Qu.:2024-02-27 05:50:02.00 | Class :character | Class :character | Class :character | Class :character | 1st Qu.:41.88 | 1st Qu.:-87.66 | 1st Qu.:41.88 | 1st Qu.: -87.66 | Class :character |
+|  | Mode :character | Mode :character | Median :2024-06-06 12:55:34.65 | Median :2024-06-06 13:17:11.44 | Mode :character | Mode :character | Mode :character | Mode :character | Median :41.90 | Median :-87.64 | Median :41.90 | Median : -87.64 | Mode :character |
+|  |  |  | Mean :2024-05-08 12:56:33.76 | Mean :2024-05-08 13:13:52.17 |  |  |  |  | Mean :41.90 | Mean :-87.65 | Mean :41.90 | Mean : -87.65 |  |
+|  |  |  | 3rd Qu.:2024-08-05 11:12:35.00 | 3rd Qu.:2024-08-05 11:35:24.94 |  |  |  |  | 3rd Qu.:41.93 | 3rd Qu.:-87.63 | 3rd Qu.:41.93 | 3rd Qu.: -87.63 |  |
+|  |  |  | Max. :2024-09-30 23:54:05.54 | Max. :2024-09-30 23:59:52.55 |  |  |  |  | Max. :42.07 | Max. :-87.52 | Max. :87.96 | Max. : 1.72 |  |
+|  |  |  |  |  |  |  |  |  |  |  | NA’s :7441 | NA’s :7441 |  |
 
 ``` r
 df |>
@@ -304,14 +304,14 @@ stations |>
   kable()
 ```
 
-| station_id                           |      lat |       lon | name                         | capacity | short_name   | region_id | address |
-|:-------------------------------------|---------:|----------:|:-----------------------------|---------:|:-------------|:----------|:--------|
-| 1955905507044284968                  | 41.92227 | -87.80202 | Nordica Ave & Medill Ave     |       15 | 21378        |           |         |
-| 1934289361049585738                  | 41.82810 | -87.69468 | California Ave & 36th St     |       15 | 21338        |           |         |
-| a3b0fae6-a135-11e9-9cda-0a87ae2ba916 | 42.01270 | -87.66606 | Glenwood Ave & Touhy Ave     |       15 | 525          |           |         |
-| a3ad4d1b-a135-11e9-9cda-0a87ae2ba916 | 41.81409 | -87.59701 | Woodlawn Ave & Lake Park Ave |       15 | KA1503000065 |           |         |
-| a3acdae2-a135-11e9-9cda-0a87ae2ba916 | 41.78008 | -87.62975 | Wentworth Ave & 63rd St      |       11 | KA1503000025 |           |         |
-| a3a9f76a-a135-11e9-9cda-0a87ae2ba916 | 41.92153 | -87.70732 | Kedzie Ave & Palmer Ct       |       15 | 13292        |           |         |
+| lat | name | short_name | station_id | capacity | lon | region_id | address |
+|---:|:---|:---|:---|---:|---:|:---|:---|
+| 41.96861 | Milwaukee Ave & Ainslie St | 24370 | 1969221526359528022 | 19 | -87.76108 | NA | NA |
+| 41.79375 | Mozart St & 55th St | 24267 | 1966307477149012058 | 11 | -87.69472 | NA | NA |
+| 41.81574 | Western Ave & 43rd St | 24245 | 1943244109954931024 | 15 | -87.68489 | NA | NA |
+| 41.93852 | Nagle Ave & Belmont Ave | 24324 | 1981488728284770592 | 16 | -87.78735 | NA | NA |
+| 41.74656 | Stony Island Ave & 82nd St | 583 | a3b29fae-a135-11e9-9cda-0a87ae2ba916 | 11 | -87.58601 | NA | NA |
+| 41.99008 | Kedvale Ave & Peterson Ave | 24159 | 1929967657204564894 | 15 | -87.73171 | NA | NA |
 
 ``` r
 stations |>
@@ -322,14 +322,14 @@ stations |>
 
 | Value      | NA’s |
 |:-----------|-----:|
-| station_id |    0 |
 | lat        |    0 |
-| lon        |    0 |
 | name       |    0 |
-| capacity   |    0 |
-| ios        |    0 |
 | android    |    0 |
+| ios        |    0 |
 | short_name |  872 |
+| station_id |    0 |
+| capacity   |    0 |
+| lon        |    0 |
 | region_id  | 1787 |
 | address    |  929 |
 
@@ -381,14 +381,14 @@ stations |>
   kable(caption = "Stations with repeated coordinates")
 ```
 
-| station_id                           | short_name   | name                              |       lon |      lat |
-|:-------------------------------------|:-------------|:----------------------------------|----------:|---------:|
-| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy        | -87.65270 | 41.93242 |
-| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\*      | -87.65270 | 41.93242 |
-| 1827484051430132402                  |              | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
-| 1715823821144840768                  |              | Public Rack - Laflin St &51st ST  | -87.66208 | 41.80135 |
-| 1677249871073777806                  |              | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
-| 1827474404723843690                  |              | Public Rack - Peterson Park       | -87.75552 | 41.97871 |
+| station_id | short_name | name | lon | lat |
+|:---|:---|:---|---:|---:|
+| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy | -87.65270 | 41.93242 |
+| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\* | -87.65270 | 41.93242 |
+| 1827484051430132402 | NA | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
+| 1677249871073777806 | NA | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
+| 1715823821144840768 | NA | Public Rack - Laflin St &51st ST | -87.66208 | 41.80135 |
+| 1827474404723843690 | NA | Public Rack - Peterson Park | -87.75552 | 41.97871 |
 
 Stations with repeated coordinates
 
@@ -402,12 +402,12 @@ stations |>
 
 | station_id          | short_name | name                   |       lon |      lat |
 |:--------------------|:-----------|:-----------------------|----------:|---------:|
-| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
 | 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
+| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
 | 1984042930424753006 | 24394      | Steelworkers Park      | -87.53091 | 41.73793 |
-| 1448642188027369086 |            | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
-| 1594046379513303720 |            | Western Ave & Lake St  | -87.68585 | 41.88461 |
-| 1448642188027369090 |            | Steelworkers Park      | -87.53107 | 41.73825 |
+| 1448642188027369090 | NA         | Steelworkers Park      | -87.53107 | 41.73825 |
+| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
+| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
 
 Stations with repeated name
 
@@ -511,28 +511,28 @@ df |>
   kable()
 ```
 
-| ride_id          | rideable_type | started_at          | ended_at            | start_station_name                   | end_station_name            | member_casual | start_station_id                     | start_lon | start_lat | end_station_id                       |   end_lon |  end_lat | ride_duration | station_fee |
-|:-----------------|:--------------|:--------------------|:--------------------|:-------------------------------------|:----------------------------|:--------------|:-------------------------------------|----------:|----------:|:-------------------------------------|----------:|---------:|--------------:|:------------|
-| 4449097279F8BBE7 | classic_bike  | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |            12 | FALSE       |
-| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St            | Sheffield Ave & Webster Ave | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |            12 | FALSE       |
-| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | Franklin St & Lake St       | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |             4 | FALSE       |
-| F92714CC6B019B96 | classic_bike  | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St            | Franklin St & Lake St       | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |             5 | FALSE       |
-| 5E34BA5DE945A9CC | classic_bike  | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St            | Franklin St & Lake St       | member        | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 |  41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 |            11 | FALSE       |
-| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member        | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 |  41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 |            14 | FALSE       |
+| ride_id | rideable_type | started_at | ended_at | start_station_name | end_station_name | member_casual | start_station_id | start_lon | start_lat | end_station_id | end_lon | end_lat | ride_duration | station_fee |
+|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|:---|---:|---:|---:|:---|
+| 4449097279F8BBE7 | classic_bike | 2023-10-08 10:36:26 | 2023-10-08 10:49:19 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 | 41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 | 12 | FALSE |
+| 9CF060543CA7B439 | electric_bike | 2023-10-11 17:23:59 | 2023-10-11 17:36:08 | Desplaines St & Kinzie St | Sheffield Ave & Webster Ave | member | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 | 41.88872 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 | 12 | FALSE |
+| 667F21F4D6BDE69C | electric_bike | 2023-10-12 07:02:33 | 2023-10-12 07:06:53 | Orleans St & Chestnut St (NEXT Apts) | Franklin St & Lake St | member | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 | 41.89820 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 | 4 | FALSE |
+| F92714CC6B019B96 | classic_bike | 2023-10-24 19:13:03 | 2023-10-24 19:18:29 | Desplaines St & Kinzie St | Franklin St & Lake St | member | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 | 41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 | 5 | FALSE |
+| 5E34BA5DE945A9CC | classic_bike | 2023-10-09 18:19:26 | 2023-10-09 18:30:56 | Desplaines St & Kinzie St | Franklin St & Lake St | member | a3a482fb-a135-11e9-9cda-0a87ae2ba916 | -87.64445 | 41.88872 | a3a6f7a5-a135-11e9-9cda-0a87ae2ba916 | -87.63550 | 41.88584 | 11 | FALSE |
+| F7D7420AFAC53CD9 | electric_bike | 2023-10-04 17:10:59 | 2023-10-04 17:25:21 | Orleans St & Chestnut St (NEXT Apts) | Sheffield Ave & Webster Ave | member | a3b35e21-a135-11e9-9cda-0a87ae2ba916 | -87.63754 | 41.89820 | a3aabad8-a135-11e9-9cda-0a87ae2ba916 | -87.65382 | 41.92154 | 14 | FALSE |
 
 ``` r
 kable(summary(df))
 ```
 
-|     | ride_id          | rideable_type    | started_at                     | ended_at                       | start_station_name | end_station_name | member_casual    | start_station_id | start_lon     | start_lat     | end_station_id   | end_lon       | end_lat       | ride_duration | station_fee   |
-|:----|:-----------------|:-----------------|:-------------------------------|:-------------------------------|:-------------------|:-----------------|:-----------------|:-----------------|:--------------|:--------------|:-----------------|:--------------|:--------------|:--------------|:--------------|
-|     | Length:5711271   | Length:5711271   | Min. :2023-10-01 00:00:05.00   | Min. :2023-10-01 00:02:02.00   | Length:5711271     | Length:5711271   | Length:5711271   | Length:5711271   | Min. :-87.8   | Min. :41.6    | Length:5711271   | Min. :-87.8   | Min. :41.6    | Min. : 1.0    | Mode :logical |
-|     | Class :character | Class :character | 1st Qu.:2024-02-26 18:20:37.00 | 1st Qu.:2024-02-26 18:36:34.50 | Class :character   | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9  | 1st Qu.: 5.0  | FALSE:4709232 |
-|     | Mode :character  | Mode :character  | Median :2024-06-06 12:04:15.07 | Median :2024-06-06 12:21:21.55 | Mode :character    | Mode :character  | Mode :character  | Mode :character  | Median :-87.6 | Median :41.9  | Mode :character  | Median :-87.6 | Median :41.9  | Median : 9.0  | TRUE :1002039 |
-|     |                  |                  | Mean :2024-05-08 10:46:49.57   | Mean :2024-05-08 11:02:37.25   |                    |                  |                  |                  | Mean :-87.6   | Mean :41.9    |                  | Mean :-87.6   | Mean :41.9    | Mean : 15.3   |               |
-|     |                  |                  | 3rd Qu.:2024-08-05 11:11:23.67 | 3rd Qu.:2024-08-05 11:30:43.33 |                    |                  |                  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  |                  | 3rd Qu.:-87.6 | 3rd Qu.:41.9  | 3rd Qu.: 17.0 |               |
-|     |                  |                  | Max. :2024-09-30 23:54:05.54   | Max. :2024-09-30 23:59:52.55   |                    |                  |                  |                  | Max. :-87.5   | Max. :42.1    |                  | Max. :-87.5   | Max. :42.1    | Max. :1509.0  |               |
-|     |                  |                  |                                |                                |                    |                  |                  |                  | NA’s :1006244 | NA’s :1006244 |                  | NA’s :1015801 | NA’s :1015801 |               |               |
+|  | ride_id | rideable_type | started_at | ended_at | start_station_name | end_station_name | member_casual | start_station_id | start_lon | start_lat | end_station_id | end_lon | end_lat | ride_duration | station_fee |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+|  | Length:5845369 | Length:5845369 | Min. :2023-10-01 00:00:05.00 | Min. :2023-10-01 00:02:02.00 | Length:5845369 | Length:5845369 | Length:5845369 | Length:5845369 | Min. :-87.8 | Min. :41.6 | Length:5845369 | Min. :-87.8 | Min. :41.6 | Min. : 1.0 | Mode :logical |
+|  | Class :character | Class :character | 1st Qu.:2024-02-27 04:55:42.00 | 1st Qu.:2024-02-27 05:16:32.00 | Class :character | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | 1st Qu.: 331.0 | FALSE:4762233 |
+|  | Mode :character | Mode :character | Median :2024-06-06 13:01:48.50 | Median :2024-06-06 13:21:01.54 | Mode :character | Mode :character | Mode :character | Mode :character | Median :-87.6 | Median :41.9 | Mode :character | Median :-87.6 | Median :41.9 | Median : 580.0 | TRUE :1083136 |
+|  |  |  | Mean :2024-05-08 13:02:16.15 | Mean :2024-05-08 13:17:42.60 |  |  |  |  | Mean :-87.6 | Mean :41.9 |  | Mean :-87.6 | Mean :41.9 | Mean : 926.2 |  |
+|  |  |  | 3rd Qu.:2024-08-05 11:48:57.01 | 3rd Qu.:2024-08-05 12:06:05.80 |  |  |  |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 | 3rd Qu.: 1028.0 |  |
+|  |  |  | Max. :2024-09-30 23:54:05.54 | Max. :2024-09-30 23:59:52.55 |  |  |  |  | Max. :-87.5 | Max. :42.1 |  | Max. :-87.5 | Max. :42.1 | Max. :90562.0 |  |
+|  |  |  |  |  |  |  |  |  | NA’s :1070550 | NA’s :1070550 |  | NA’s :1097434 | NA’s :1097434 |  |  |
 
 We have now finished our data cleaning process. Now that our data is
 ready, let’s continue with our analysis.
@@ -726,7 +726,6 @@ df |>
   ) +
   global_theme() +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
-  global_theme() +
   theme(
     axis.text.x = element_text(
       color = c("white", "red", "white", "red", "white")
@@ -746,8 +745,8 @@ during weekdays member have an spike of usage at 8am, which is very
 consistent across all the year.
 
 Given that, aside from this spike, most usage is quite similar between
-users, we should explore why members have this spike in usage, maybe
-some trend will appear if we dig dipper inside our dataframe.
+users, we should explore why members have this spike in usage. Looking
+up for this trend, let’s look at the following plot.
 
 ``` r
 c(1)

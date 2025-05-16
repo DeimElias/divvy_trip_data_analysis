@@ -146,7 +146,7 @@ df |>
       unique(),
     by = join_by(start_station_name == name)
   ) |>
-  filter(start_station_name != "NA") |>
+  filter(!is.na(start_station_name)) |>
   ggplot() +
   aes(x = started_at) +
   geom_histogram(bins = 12) +

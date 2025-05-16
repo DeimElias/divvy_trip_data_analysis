@@ -17,14 +17,15 @@
           recommendedPackages = prev.radianWrapper.recommendedPackages ++ (with final.rPackages; [ knitr tidyverse sf mapview jsonlite geosphere furrr styler languageserver scales ]);
         };
       };
+
       overlays.quarto = final: prev: {
         quarto = prev.quarto.override {
           rWrapper = final.rEnv;
         };
       };
+
       packages =  forEachSupportedSystem ({ pkgs }: {
         default = pkgs.writeShellScriptBin "preview" ''
-          ${pkgs.quarto}/bin/quarto check
           ${pkgs.quarto}/bin/quarto preview ./README.qmd --port 42069
           ''; 
       });
@@ -34,6 +35,7 @@
           program = "${self.packages.${system}.default}/bin/preview";
         };
       });
+       
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           packages = with pkgs;
