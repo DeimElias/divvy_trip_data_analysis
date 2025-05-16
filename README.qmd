@@ -380,7 +380,7 @@ df <- df |>
       "Public Rack - Peterson Park", end_station_name
     )
   ) |>
-  mutate(ride_duration = as.integer((ended_at - started_at)/60)) |>
+  mutate(ride_duration = as.integer((ended_at - started_at) / 60)) |>
   filter(ride_duration > 0) |>
   mutate(station_fee = is.na(end_station_name))
 
@@ -471,7 +471,7 @@ df |>
     legend.background = element_rect(fill = "#150F3A", color = "white"),
     legend.text = element_text(color = "white"),
     legend.title = element_text(color = "white"),
-    legend.position = "bottom"
+    legend.position = "bottom",
   )
 
 ```
@@ -588,7 +588,6 @@ df |>
   ) +
   global_theme() +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
-  global_theme() +
   theme(
     axis.text.x = element_text(
       color = c("white", "red", "white", "red", "white")
