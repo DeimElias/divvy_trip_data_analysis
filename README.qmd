@@ -526,9 +526,6 @@ df |>
     legend.position = "bottom",
   )
 
-
-
-
 df |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
   ggplot() +
@@ -610,11 +607,6 @@ we should explore why members have this spike in usage. Looking up for this
 trend, let's look at the following plot.
 
 ```{r} 
-df |>
-  select(ride_id, start_station_id, start_station_name, started_at, start_lat, start_lon, member_casual) |>
-  st_as_sf(coords = c("start_lon", "start_lat")) |>
-  st_crs() |>
-  mapview()
 
   
   
