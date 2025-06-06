@@ -304,14 +304,14 @@ stations |>
   kable()
 ```
 
-| lat | name | short_name | station_id | capacity | lon | region_id | address |
+| capacity | short_name | name | station_id | lat | lon | region_id | address |
 |---:|:---|:---|:---|---:|---:|:---|:---|
-| 41.96861 | Milwaukee Ave & Ainslie St | 24370 | 1969221526359528022 | 19 | -87.76108 | NA | NA |
-| 41.79375 | Mozart St & 55th St | 24267 | 1966307477149012058 | 11 | -87.69472 | NA | NA |
-| 41.81574 | Western Ave & 43rd St | 24245 | 1943244109954931024 | 15 | -87.68489 | NA | NA |
-| 41.93852 | Nagle Ave & Belmont Ave | 24324 | 1981488728284770592 | 16 | -87.78735 | NA | NA |
-| 41.74656 | Stony Island Ave & 82nd St | 583 | a3b29fae-a135-11e9-9cda-0a87ae2ba916 | 11 | -87.58601 | NA | NA |
-| 41.99008 | Kedvale Ave & Peterson Ave | 24159 | 1929967657204564894 | 15 | -87.73171 | NA | NA |
+| 19 | 13036 | Michigan Ave & Madison St | a3a795d7-a135-11e9-9cda-0a87ae2ba916 | 41.88213 | -87.62512 |  |  |
+| 16 | 24358 | Loomis St & 95th St | 2013067286975627866 | 41.72148 | -87.65774 |  |  |
+| 15 | 24178 | Meade Ave & Fullerton Ave | 1934288718318207280 | 41.92475 | -87.77827 |  |  |
+| 19 | 15529 | Mies van der Rohe Way & Chestnut St | a3a62566-a135-11e9-9cda-0a87ae2ba916 | 41.89859 | -87.62192 |  |  |
+| 15 | 20244 | Halsted St & 73rd St | a60781db-2bec-4a15-a4a2-363297aefcec | 41.76161 | -87.64416 |  |  |
+| 15 | 23190 | Karlov Ave & Armitage Ave | 1867616662773391950 | 41.91748 | -87.72895 |  |  |
 
 ``` r
 stations |>
@@ -322,16 +322,16 @@ stations |>
 
 | Value      | NA’s |
 |:-----------|-----:|
-| lat        |    0 |
-| name       |    0 |
-| android    |    0 |
-| ios        |    0 |
-| short_name |  872 |
-| station_id |    0 |
 | capacity   |    0 |
+| short_name |  879 |
+| name       |    0 |
+| ios        |    0 |
+| android    |    0 |
+| station_id |    0 |
+| lat        |    0 |
 | lon        |    0 |
-| region_id  | 1787 |
-| address    |  929 |
+| region_id  | 1818 |
+| address    |  953 |
 
 ``` r
 stations <- stations |>
@@ -345,7 +345,7 @@ stations |>
 
 | Dimension |
 |----------:|
-|      1801 |
+|      1832 |
 |         1 |
 
 ``` r
@@ -357,7 +357,7 @@ stations |>
 
 | Dimension |
 |----------:|
-|      1798 |
+|      1828 |
 |         2 |
 
 ``` r
@@ -384,11 +384,13 @@ stations |>
 | station_id | short_name | name | lon | lat |
 |:---|:---|:---|---:|---:|
 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy | -87.65270 | 41.93242 |
+| 2078379617704292706 | T13243 | Wabansia & Milwaukee | -87.68267 | 41.91375 |
 | d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\* | -87.65270 | 41.93242 |
-| 1827484051430132402 | NA | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
-| 1677249871073777806 | NA | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
-| 1715823821144840768 | NA | Public Rack - Laflin St &51st ST | -87.66208 | 41.80135 |
-| 1827474404723843690 | NA | Public Rack - Peterson Park | -87.75552 | 41.97871 |
+| a3a6d884-a135-11e9-9cda-0a87ae2ba916 | 13243 | Milwaukee Ave & Wabansia Ave | -87.68267 | 41.91375 |
+| 1827484051430132402 |  | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
+| 1677249871073777806 |  | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
+| 1715823821144840768 |  | Public Rack - Laflin St &51st ST | -87.66208 | 41.80135 |
+| 1827474404723843690 |  | Public Rack - Peterson Park | -87.75552 | 41.97871 |
 
 Stations with repeated coordinates
 
@@ -402,12 +404,10 @@ stations |>
 
 | station_id          | short_name | name                   |       lon |      lat |
 |:--------------------|:-----------|:-----------------------|----------:|---------:|
-| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
 | 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
-| 1984042930424753006 | 24394      | Steelworkers Park      | -87.53091 | 41.73793 |
-| 1448642188027369090 | NA         | Steelworkers Park      | -87.53107 | 41.73825 |
-| 1594046379513303720 | NA         | Western Ave & Lake St  | -87.68585 | 41.88461 |
-| 1448642188027369086 | NA         | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
+| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
+| 1594046379513303720 |            | Western Ave & Lake St  | -87.68585 | 41.88461 |
+| 1448642188027369086 |            | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
 
 Stations with repeated name
 
@@ -526,13 +526,13 @@ kable(summary(df))
 
 |  | ride_id | rideable_type | started_at | ended_at | start_station_name | end_station_name | member_casual | start_station_id | start_lon | start_lat | end_station_id | end_lon | end_lat | ride_duration | station_fee |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-|  | Length:5845369 | Length:5845369 | Min. :2023-10-01 00:00:05.00 | Min. :2023-10-01 00:02:02.00 | Length:5845369 | Length:5845369 | Length:5845369 | Length:5845369 | Min. :-87.8 | Min. :41.6 | Length:5845369 | Min. :-87.8 | Min. :41.6 | Min. : 1.0 | Mode :logical |
-|  | Class :character | Class :character | 1st Qu.:2024-02-27 04:55:42.00 | 1st Qu.:2024-02-27 05:16:32.00 | Class :character | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | 1st Qu.: 331.0 | FALSE:4762233 |
-|  | Mode :character | Mode :character | Median :2024-06-06 13:01:48.50 | Median :2024-06-06 13:21:01.54 | Mode :character | Mode :character | Mode :character | Mode :character | Median :-87.6 | Median :41.9 | Mode :character | Median :-87.6 | Median :41.9 | Median : 580.0 | TRUE :1083136 |
-|  |  |  | Mean :2024-05-08 13:02:16.15 | Mean :2024-05-08 13:17:42.60 |  |  |  |  | Mean :-87.6 | Mean :41.9 |  | Mean :-87.6 | Mean :41.9 | Mean : 926.2 |  |
-|  |  |  | 3rd Qu.:2024-08-05 11:48:57.01 | 3rd Qu.:2024-08-05 12:06:05.80 |  |  |  |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 | 3rd Qu.: 1028.0 |  |
-|  |  |  | Max. :2024-09-30 23:54:05.54 | Max. :2024-09-30 23:59:52.55 |  |  |  |  | Max. :-87.5 | Max. :42.1 |  | Max. :-87.5 | Max. :42.1 | Max. :90562.0 |  |
-|  |  |  |  |  |  |  |  |  | NA’s :1070550 | NA’s :1070550 |  | NA’s :1097434 | NA’s :1097434 |  |  |
+|  | Length:5711271 | Length:5711271 | Min. :2023-10-01 00:00:05.00 | Min. :2023-10-01 00:02:02.00 | Length:5711271 | Length:5711271 | Length:5711271 | Length:5711271 | Min. :-87.8 | Min. :41.6 | Length:5711271 | Min. :-87.8 | Min. :41.6 | Min. : 1.0 | Mode :logical |
+|  | Class :character | Class :character | 1st Qu.:2024-02-26 18:20:37.00 | 1st Qu.:2024-02-26 18:36:34.50 | Class :character | Class :character | Class :character | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | Class :character | 1st Qu.:-87.7 | 1st Qu.:41.9 | 1st Qu.: 5.0 | FALSE:4709232 |
+|  | Mode :character | Mode :character | Median :2024-06-06 12:04:15.07 | Median :2024-06-06 12:21:21.55 | Mode :character | Mode :character | Mode :character | Mode :character | Median :-87.6 | Median :41.9 | Mode :character | Median :-87.6 | Median :41.9 | Median : 9.0 | TRUE :1002039 |
+|  |  |  | Mean :2024-05-08 10:46:49.57 | Mean :2024-05-08 11:02:37.25 |  |  |  |  | Mean :-87.6 | Mean :41.9 |  | Mean :-87.6 | Mean :41.9 | Mean : 15.3 |  |
+|  |  |  | 3rd Qu.:2024-08-05 11:11:23.67 | 3rd Qu.:2024-08-05 11:30:43.33 |  |  |  |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 | 3rd Qu.: 17.0 |  |
+|  |  |  | Max. :2024-09-30 23:54:05.54 | Max. :2024-09-30 23:59:52.55 |  |  |  |  | Max. :-87.5 | Max. :42.1 |  | Max. :-87.5 | Max. :42.1 | Max. :1509.0 |  |
+|  |  |  |  |  |  |  |  |  | NA’s :1024040 | NA’s :1024040 |  | NA’s :1033624 | NA’s :1033624 |  |  |
 
 We have now finished our data cleaning process. Now that our data is
 ready, let’s continue with our analysis.
