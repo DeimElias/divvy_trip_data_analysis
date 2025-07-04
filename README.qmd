@@ -413,7 +413,10 @@ df |>
   ggplot() +
   aes(x = member_casual, y = avg_ride_duration, fill = member_casual) +
   geom_col(color = "#000000") +
-  facet_wrap(~rideable_type, labeller = as_labeller(function(string)  gsub("_", " ", string))) +
+  facet_wrap(
+    ~rideable_type,
+    labeller = as_labeller(function(string)  gsub("_", " ", string))
+  ) +
   global_theme() +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
   theme(legend.position = "none") +
@@ -434,36 +437,45 @@ take a look at the distribution of usage
 df |>
   select(member_casual, rideable_type, ride_duration) |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
-  group_by(member_casual, rideable_type) |>
-  summarize(mean_duration = round(mean(ride_duration), 2)) |>
   ggplot() +
-  geom_freqpoly(
-    data = df |>
-      select(member_casual, rideable_type, ride_duration) |>
-      slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration),
-    aes(x = ride_duration, color = member_casual),
+  geom_ribbon(
+    stat = "bin",
+    binwidth = 1,
+    outline.type = "upper",
+    aes(
+      fill = after_scale(alpha(color, .01)),
+      x = ride_duration,
+      color = member_casual,
+      ymin = after_stat(group),
+      ymax = after_stat(group + ndensity)
+    ),
+    position = position_nudge(y = -0.5),
     show.legend = FALSE
   ) +
-  geom_vline(
-    aes(xintercept = mean_duration, color = member_casual),
-    linetype = 2,
+  geom_boxplot(
+    aes(
+      x = ride_duration,
+      y = member_casual,
+      color = member_casual,
+      fill = after_scale(alpha(color, 0.2))
+    ),
+    outlier.shape = 4,
+    outlier.color = "red",
+    outlier.size = .15,
     show.legend = FALSE
   ) +
-  geom_label(
-    aes(x = mean_duration, label = mean_duration, fill = member_casual),
-    y = c(250000, 250000, 12500, 100000, 100000, 5000),
-    hjust = 0
+  facet_wrap(
+    ~rideable_type,
+    dir = "v",
+    labeller = as_labeller(function(string) gsub("_", " ", string))
   ) +
-  scale_y_continuous(label = label_number()) +
-  facet_wrap(~rideable_type, dir = "v", scales = "free_y") +
   global_theme() +
   labs(
-    y = "Number of rides",
+    y = "Type of user",
     x = "Time interval (minutes)",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
     caption = "Top 99% lower ride duration",
-    fill = "Mean ride duration",
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
@@ -473,6 +485,35 @@ df |>
     legend.title = element_text(color = "white"),
     legend.position = "bottom",
   )
+
+df |>
+  slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
+  ggplot() +
+  aes(x = ride_duration, color = member_casual) +
+  geom_freqpoly(binwidth  = 1) +
+  facet_wrap(
+    ~rideable_type,
+    dir = "v",
+    labeller = as_labeller(function(string) gsub("_", " ", string)),
+    scales = "free"
+  ) +
+  global_theme() +
+  labs(
+    y = "Type of user",
+    x = "Time interval (minutes)",
+    title = "Distribution of ride duration per customer type and vehicle",
+    subtitle = "Data from Oct-2023 to Oct-2024",
+    caption = "Top 99% lower ride duration",
+  ) +
+  scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
+  scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom",
+  )
+  
 
 ```
 On average, casual users tend to use the service for longer periods of time,

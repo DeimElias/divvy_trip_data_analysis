@@ -304,14 +304,14 @@ stations |>
   kable()
 ```
 
-| capacity | short_name | name | station_id | lat | lon | region_id | address |
-|---:|:---|:---|:---|---:|---:|:---|:---|
-| 19 | 13036 | Michigan Ave & Madison St | a3a795d7-a135-11e9-9cda-0a87ae2ba916 | 41.88213 | -87.62512 |  |  |
-| 16 | 24358 | Loomis St & 95th St | 2013067286975627866 | 41.72148 | -87.65774 |  |  |
-| 15 | 24178 | Meade Ave & Fullerton Ave | 1934288718318207280 | 41.92475 | -87.77827 |  |  |
-| 19 | 15529 | Mies van der Rohe Way & Chestnut St | a3a62566-a135-11e9-9cda-0a87ae2ba916 | 41.89859 | -87.62192 |  |  |
-| 15 | 20244 | Halsted St & 73rd St | a60781db-2bec-4a15-a4a2-363297aefcec | 41.76161 | -87.64416 |  |  |
-| 15 | 23190 | Karlov Ave & Armitage Ave | 1867616662773391950 | 41.91748 | -87.72895 |  |  |
+| lat | lon | name | short_name | station_id | capacity | region_id | address |
+|---:|---:|:---|:---|:---|---:|:---|:---|
+| 41.83202 | -87.67784 | Hoyne Ave & 34th St | CHI01898 | 1934289130932983934 | 15 |  |  |
+| 41.98096 | -87.76149 | Lynch Ave & Elston Ave | CHI02000 | 2021144286196005052 | 16 |  |  |
+| 41.76551 | -87.61692 | Calumet Ave & 71st St | CHI00293 | a3acea44-a135-11e9-9cda-0a87ae2ba916 | 11 |  |  |
+| 41.93242 | -87.65270 | Wilton Ave & Diversey Pkwy | CHI00226 | a3a3a282-a135-11e9-9cda-0a87ae2ba916 | 35 |  |  |
+| 41.96835 | -87.71183 | Christiana Ave & Lawrence Ave | CHI00302 | a3af8123-a135-11e9-9cda-0a87ae2ba916 | 15 |  |  |
+| 41.88021 | -87.75534 | Laramie Ave & Madison St | CHI01276 | a3b148bf-a135-11e9-9cda-0a87ae2ba916 | 11 |  |  |
 
 ``` r
 stations |>
@@ -322,16 +322,16 @@ stations |>
 
 | Value      | NA’s |
 |:-----------|-----:|
-| capacity   |    0 |
-| short_name |  879 |
-| name       |    0 |
-| ios        |    0 |
-| android    |    0 |
-| station_id |    0 |
 | lat        |    0 |
+| android    |    0 |
+| ios        |    0 |
 | lon        |    0 |
-| region_id  | 1818 |
-| address    |  953 |
+| name       |    0 |
+| short_name |  878 |
+| station_id |    0 |
+| capacity   |    0 |
+| region_id  | 1819 |
+| address    |  955 |
 
 ``` r
 stations <- stations |>
@@ -345,7 +345,7 @@ stations |>
 
 | Dimension |
 |----------:|
-|      1832 |
+|      1833 |
 |         1 |
 
 ``` r
@@ -357,7 +357,7 @@ stations |>
 
 | Dimension |
 |----------:|
-|      1828 |
+|      1830 |
 |         2 |
 
 ``` r
@@ -383,14 +383,12 @@ stations |>
 
 | station_id | short_name | name | lon | lat |
 |:---|:---|:---|---:|---:|
-| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | TA1306000014 | Wilton Ave & Diversey Pkwy | -87.65270 | 41.93242 |
-| 2078379617704292706 | T13243 | Wabansia & Milwaukee | -87.68267 | 41.91375 |
-| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | chargingstx2 | Wilton Ave & Diversey Pkwy\* | -87.65270 | 41.93242 |
-| a3a6d884-a135-11e9-9cda-0a87ae2ba916 | 13243 | Milwaukee Ave & Wabansia Ave | -87.68267 | 41.91375 |
-| 1827484051430132402 |  | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
-| 1677249871073777806 |  | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
-| 1715823821144840768 |  | Public Rack - Laflin St &51st ST | -87.66208 | 41.80135 |
+| a3a3a282-a135-11e9-9cda-0a87ae2ba916 | CHI00226 | Wilton Ave & Diversey Pkwy | -87.65270 | 41.93242 |
+| d53ae727-5265-4b8e-a6ca-2a36dc0345c4 | CHI02052 | Wilton Ave & Diversey Pkwy\* | -87.65270 | 41.93242 |
 | 1827474404723843690 |  | Public Rack - Peterson Park | -87.75552 | 41.97871 |
+| 1677249871073777806 |  | Public Rack - Laflin St & 51st St | -87.66208 | 41.80135 |
+| 1827484051430132402 |  | Public Rack - Forest Glen Station | -87.75552 | 41.97871 |
+| 1715823821144840768 |  | Public Rack - Laflin St &51st ST | -87.66208 | 41.80135 |
 
 Stations with repeated coordinates
 
@@ -404,8 +402,8 @@ stations |>
 
 | station_id          | short_name | name                   |       lon |      lat |
 |:--------------------|:-----------|:-----------------------|----------:|---------:|
-| 1978857650118994914 | 24409      | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
-| 1967727360320698512 | 24211      | Western Ave & Lake St  | -87.68668 | 41.88481 |
+| 1967727360320698512 | CHI01848   | Western Ave & Lake St  | -87.68668 | 41.88481 |
+| 1978857650118994914 | CHI01933   | Indiana Ave & 133rd St | -87.61719 | 41.65380 |
 | 1594046379513303720 |            | Western Ave & Lake St  | -87.68585 | 41.88461 |
 | 1448642188027369086 |            | Indiana Ave & 133rd St | -87.61705 | 41.65356 |
 
@@ -532,7 +530,7 @@ kable(summary(df))
 |  |  |  | Mean :2024-05-08 10:46:49.57 | Mean :2024-05-08 11:02:37.25 |  |  |  |  | Mean :-87.6 | Mean :41.9 |  | Mean :-87.6 | Mean :41.9 | Mean : 15.3 |  |
 |  |  |  | 3rd Qu.:2024-08-05 11:11:23.67 | 3rd Qu.:2024-08-05 11:30:43.33 |  |  |  |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 |  | 3rd Qu.:-87.6 | 3rd Qu.:41.9 | 3rd Qu.: 17.0 |  |
 |  |  |  | Max. :2024-09-30 23:54:05.54 | Max. :2024-09-30 23:59:52.55 |  |  |  |  | Max. :-87.5 | Max. :42.1 |  | Max. :-87.5 | Max. :42.1 | Max. :1509.0 |  |
-|  |  |  |  |  |  |  |  |  | NA’s :1024040 | NA’s :1024040 |  | NA’s :1033624 | NA’s :1033624 |  |  |
+|  |  |  |  |  |  |  |  |  | NA’s :1054625 | NA’s :1054625 |  | NA’s :1065110 | NA’s :1065110 |  |  |
 
 We have now finished our data cleaning process. Now that our data is
 ready, let’s continue with our analysis.
@@ -551,7 +549,10 @@ df |>
   ggplot() +
   aes(x = member_casual, y = avg_ride_duration, fill = member_casual) +
   geom_col(color = "#000000") +
-  facet_wrap(~rideable_type, labeller = as_labeller(function(string)  gsub("_", " ", string))) +
+  facet_wrap(
+    ~rideable_type,
+    labeller = as_labeller(function(string)  gsub("_", " ", string))
+  ) +
   global_theme() +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
   theme(legend.position = "none") +
@@ -572,36 +573,45 @@ let’s take a look at the distribution of usage
 df |>
   select(member_casual, rideable_type, ride_duration) |>
   slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
-  group_by(member_casual, rideable_type) |>
-  summarize(mean_duration = round(mean(ride_duration), 2)) |>
   ggplot() +
-  geom_freqpoly(
-    data = df |>
-      select(member_casual, rideable_type, ride_duration) |>
-      slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration),
-    aes(x = ride_duration, color = member_casual),
+  geom_ribbon(
+    stat = "bin",
+    binwidth = 1,
+    outline.type = "upper",
+    aes(
+      fill = after_scale(alpha(color, .01)),
+      x = ride_duration,
+      color = member_casual,
+      ymin = after_stat(group),
+      ymax = after_stat(group + ndensity)
+    ),
+    position = position_nudge(y = -0.5),
     show.legend = FALSE
   ) +
-  geom_vline(
-    aes(xintercept = mean_duration, color = member_casual),
-    linetype = 2,
+  geom_boxplot(
+    aes(
+      x = ride_duration,
+      y = member_casual,
+      color = member_casual,
+      fill = after_scale(alpha(color, 0.2))
+    ),
+    outlier.shape = 4,
+    outlier.color = "red",
+    outlier.size = .15,
     show.legend = FALSE
   ) +
-  geom_label(
-    aes(x = mean_duration, label = mean_duration, fill = member_casual),
-    y = c(250000, 250000, 12500, 100000, 100000, 5000),
-    hjust = 0
+  facet_wrap(
+    ~rideable_type,
+    dir = "v",
+    labeller = as_labeller(function(string) gsub("_", " ", string))
   ) +
-  scale_y_continuous(label = label_number()) +
-  facet_wrap(~rideable_type, dir = "v", scales = "free_y") +
   global_theme() +
   labs(
-    y = "Number of rides",
+    y = "Type of user",
     x = "Time interval (minutes)",
     title = "Distribution of ride duration per customer type and vehicle",
     subtitle = "Data from Oct-2023 to Oct-2024",
     caption = "Top 99% lower ride duration",
-    fill = "Mean ride duration",
   ) +
   scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
   scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
@@ -614,6 +624,38 @@ df |>
 ```
 
 ![](README_files/figure-commonmark/Distribution%20of%20rides%20duration,%20per%20bike%20type-1.png)
+
+``` r
+df |>
+  slice_min(n = as.integer(dim(df)[1] * 0.99), order_by = ride_duration) |>
+  ggplot() +
+  aes(x = ride_duration, color = member_casual) +
+  geom_freqpoly(binwidth  = 1) +
+  facet_wrap(
+    ~rideable_type,
+    dir = "v",
+    labeller = as_labeller(function(string) gsub("_", " ", string)),
+    scales = "free"
+  ) +
+  global_theme() +
+  labs(
+    y = "Type of user",
+    x = "Time interval (minutes)",
+    title = "Distribution of ride duration per customer type and vehicle",
+    subtitle = "Data from Oct-2023 to Oct-2024",
+    caption = "Top 99% lower ride duration",
+  ) +
+  scale_color_manual(values = c("#06CEFD", "#B7FA8A")) +
+  scale_fill_manual(values = c("#06CEFD", "#B7FA8A")) +
+  theme(
+    legend.background = element_rect(fill = "#150F3A", color = "white"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    legend.position = "bottom",
+  )
+```
+
+![](README_files/figure-commonmark/Distribution%20of%20rides%20duration,%20per%20bike%20type-2.png)
 
 On average, casual users tend to use the service for longer periods of
 time, but they have less rides overall. Since casual users pay for each
